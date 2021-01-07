@@ -1,53 +1,59 @@
-#' Visual acuity entry cleaner
+#' Cleaning up Visual acuity entries
 #' @name clean_va
 #' @param x Vector with VA entries
 #' @param quali strings for qualitative visual acuity entries
+#' @param message message for replaced NA values
 #' @description VA cleaning:
-#' 1. [isNAstring()]:
+#' 1. [tidyNA]:
 #'   Replacing empty placeholders (".","", "(any number of empty space)",
-#'   "NULL", "NA", "N/A" ) - any cases - with NA
-#' 1. [convert_NLP()] Simplifying the notation for qualitative VA notation
-#' (NPL becomes NLP, PL becomes LP)
+#'   "NULL", "NA", "N/A" , "-") - any cases - with NA
+#' 1. Simplifying the notation for qualitative
+#' VA notation (NPL becomes NLP, PL becomes LP)
 #' 1. Removing non-Snellen character strings
 #' @return character vector
 #' @family VA cleaner
 #' @export
-clean_va <- function(x, quali = c("nlp", "lp", "hm", "cf")) {
-  x <- tolower(x)
-  x[isNAstring(x, tolower = FALSE)] <- NA_character_
-  x <- gsub("\\s", "", x)
-  x <- convert_NLP(x, tolower = FALSE)
+clean_va <- function(x, quali = c("nlp", "lp", "hm", "cf"), message = TRUE) {
+  originalNA <- is.na(x)
+  x_tidied <- tolower(tidyNA(x))
+  x_tidied <- gsub("\\s", "", x_tidied)
 
-  x_quali <- x %in% quali
-  x_snell <- grepl("/", x)
-  x_num <- !is.na(suppressWarnings(as.numeric(x)))
-  x_keep <- as.logical(x_quali + x_snell + x_num)
-  x[!x_keep] <- NA
-  x
-}
+  # unifying nlp/npl etc
+  replace_PL = c(pl = "lp", npl = "nlp")
+  new_vec <- replace_PL[x_tidied]
+  x_tidied <- unname(ifelse(is.na(new_vec), x_tidied, new_vec))
 
-#' @rdname clean_va
-#' @param replace_PL named vector how to rename qualitative VA
-#' @param tolower if TRUE, x will be converted to lower first
-#' @family VA cleaner
-convert_NLP <- function(x, replace_PL = c(pl = "lp", npl = "nlp"),
-                        tolower = TRUE) {
-    if(tolower){
-      x <- tolower(x)
-    }
-  new_vec <- replace_PL[x]
-  unname(ifelse(is.na(new_vec), x, new_vec))
-}
+  x_quali <- x_tidied %in% quali
+  x_snell <- grepl("/", x_tidied)
+  x_num <- !is.na(suppressWarnings(as.numeric(x_tidied)))
+  x_keep <- as.logical(x_quali + x_snell + x_num + originalNA)
 
-#' @rdname clean_va
-#' @param full vector of full strings to be replaced by NA
-#' @param tolower if TRUE, x will be converted to lower first
-isNAstring <- function(x, full = c("\\.+", "", "\\s+", "n/a", "na", "null"),
-                       tolower = TRUE) {
-  if(tolower){
-    x <- tolower(x)
+  if(message){
+  introduceNA(x, !x_keep)
   }
-  full <- paste0("^", paste(full, collapse = "$|^"), "$")
-  ismissing <- grepl(full, x)
-  ismissing
+  x_tidied[!x_keep] <- NA
+
+  if (sum(x_quali, x_snell) == 0) {
+    return(as.numeric(x_tidied))
+  }
+  x_tidied
+}
+
+#' @rdname clean_va
+#' @export
+cleanVA <- clean_va
+
+#' introduce NA for implausible VA entries
+#' @name introduceNA
+#' @param x vector
+#' @param test plausibility test
+#' @return vector
+#' @keywords internal
+introduceNA <- function(x, test){
+  if(any(test)){
+    message(paste0(
+      sum(test, na.rm = TRUE), "x NA introduced for: ",
+      paste(unique(x[test]), collapse = ", ")
+    ))
+  }
 }

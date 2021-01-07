@@ -2,30 +2,19 @@
 % Please edit documentation in R/va_cleaner.R
 \name{clean_va}
 \alias{clean_va}
-\alias{convert_NLP}
-\alias{isNAstring}
-\title{Visual acuity entry cleaner}
+\alias{cleanVA}
+\title{Cleaning up Visual acuity entries}
 \usage{
-clean_va(x, quali = c("nlp", "lp", "hm", "cf"))
+clean_va(x, quali = c("nlp", "lp", "hm", "cf"), message = TRUE)
 
-convert_NLP(x, replace_PL = c(pl = "lp", npl = "nlp"), tolower = TRUE)
-
-isNAstring(
-  x,
-  full = c("\\\\.+", "", "\\\\s+", "n/a", "na", "null"),
-  tolower = TRUE
-)
+cleanVA(x, quali = c("nlp", "lp", "hm", "cf"), message = TRUE)
 }
 \arguments{
 \item{x}{Vector with VA entries}
 
 \item{quali}{strings for qualitative visual acuity entries}
 
-\item{replace_PL}{named vector how to rename qualitative VA}
-
-\item{tolower}{if TRUE, x will be converted to lower first}
-
-\item{full}{vector of full strings to be replaced by NA}
+\item{message}{message for replaced NA values}
 }
 \value{
 character vector
@@ -33,18 +22,15 @@ character vector
 \description{
 VA cleaning:
 \enumerate{
-\item \code{\link[=isNAstring]{isNAstring()}}:
+\item \link{tidyNA}:
 Replacing empty placeholders (".","", "(any number of empty space)",
-"NULL", "NA", "N/A" ) - any cases - with NA
-\item \code{\link[=convert_NLP]{convert_NLP()}} Simplifying the notation for qualitative VA notation
-(NPL becomes NLP, PL becomes LP)
+"NULL", "NA", "N/A" , "-") - any cases - with NA
+\item Simplifying the notation for qualitative
+VA notation (NPL becomes NLP, PL becomes LP)
 \item Removing non-Snellen character strings
 }
 }
 \seealso{
-Other VA cleaner: 
-\code{\link{va}()}
-
 Other VA cleaner: 
 \code{\link{va}()}
 }

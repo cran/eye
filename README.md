@@ -16,124 +16,143 @@ See more with *eye*
 *eye* is dedicated to facilitate very common tasks in ophthalmic
 research.
 
-  - Visual acuity conversion for snellen, logMAR and ETDRS
-  - Counting patients and eyes
-  - Recode eye strings
-  - Reshape eye specific variables  
-  - Summarizing data with common statistics (mean, sd, n, range)
-  - Calculating age of patients
+## Features
 
-*eye* includes [`amd`](#amd-data), a real life data set of people who
-received intravitreal injections due to age-related macular degeneration
-in **Moorfields Eye Hospital**. (Fasler et al. [2019](#ref-fasler))
+  - [Handling of visual acuity notations](#visual-acuity)
+  - [Easy count of patients and eyes](#count-patients-and-eyes), return
+    a vector or a text for your report
+  - [Easy recoding of your eye variable](#recoding-the-eye-variable)
+  - Reshape your eye data - [long](#myop) or [wide](#hyperop)
+  - [Quick summary of your eye data](#blink)
+  - [Get common summary statistics](#reveal)
+  - [Calculate age](#getage)
+  - [Clean NA equivalent entries](#clean-na-entries)
 
 ## Installation
 
-you can install the development version from github with devtools:
+You can install eye [from CRAN](https://CRAN.R-project.org/package=eye)
+using `install.packages("eye")`
 
-``` r
-# install.packages("devtools")
-devtools::install_github("tjebo/eye")
-```
+Or you can install the development version from github:
 
-## Features
+    # install.packages("devtools")
+    devtools::install_github("tjebo/eye")
 
-### Only eye
-
-  - va: [Conversion of visual acuity notations](#va)
-  - eyes: [Easy count of patients and eyes](#eyes)
-  - eyestr: [return eye count as text for your report](#eyestr)
-  - recodeye: [recode eye variable](#recodeye)
-  - myop: [Make your eye data long](#myop)
-  - hyperop: [Make your eye data wide](#hyperop)
-  - blink: [Perceive your data in a blink of an eye](#blink)
-  - Visual acuity [conversion chart](#va-conversion)
-  - **AMD data**: [Anonymized real life
-    data](https://datadryad.org/stash/dataset/doi:10.5061/dryad.97r9289)
-    from a large cohort of patients with treatment-naive neovascular
-    age-related macular degeneration (AMD) who received intravitreal
-    anti-VEGF therapy in Moorfields Eye Hospital, London, UK. </br>
-    **Kindly reference this data by citing the corresponding
-    publication**. (Fasler et al. [2019](#ref-fasler))
-
-### Beyond eyes
-
-  - reveal: [Get common summary statistics](#reveal)
-  - age: [Calculate age](#age)
+Installing eye will also install
+[eyedata](https://github.com/tjebo/eyedata/), a package collating open
+source ophthalmic data sets.
 
 ## Details and examples
 
-### va
+### Visual acuity
 
-Easy conversion from visual acuity notations in a single call to `va()`:
-Automatic detection of VA notation and convert to logMAR by default (but
-you can convert to snellen or ETDRS as well). For some more details see
-[VA
-conversion](#va-conversion)
+Pesky visual acuity notations are now a matter of the past. Convert
+between any of Snellen (meter/ feet/ decimal\!), logMAR and ETDRS. The
+notation will be detected automatically and converted to the desired
+notation. For some more details see [VA conversion](#va-conversion). For
+entries with mixed notation, use `va_mixed` instead.
+
+You can also decide to simply “clean” your VA vector with `cleanVA(x)`.
+This will remove all entries that are certainly no VA.
+
+#### Examples
 
 ``` r
-## automatic detection of VA notation and converting to logMAR by default
 x <- c(23, 56, 74, 58) ## ETDRS letters
-va(x)
-#> x: from etdrs
+to_logmar(x) # wrapper of va(x, to = "logmar")
+#> From etdrs
 #> [1] 1.24 0.58 0.22 0.54
 
-va(x, to = "snellen") ## ... or convert to snellen
-#> x: from etdrs
+## ... or convert to snellen
+to_snellen(x) 
+#> From etdrs
 #> [1] "20/320" "20/80"  "20/32"  "20/70"
 
-## A mix of notations
-x <- c("NLP", "0.8", "34", "3/60", "2/200", "20/50")
-va(x)
-#> Mixed object (x) - converting one by one
-#> [1] 3.00 0.80 1.02 1.30 2.00 0.40
+## eye knows metric as well 
+to_snellen(x, type = "m") 
+#> From etdrs
+#> [1] "6/96"  "6/24"  "6/9.6" "6/21"
 
-## "plus/minus" entries are converted to the most probable threshold (any spaces allowed)
-x <- c("20/200", "20/200 - 1", "6/6", "6/6-2", "20/50 + 3", "20/50 -2")
-va(x)
-#> x: from snellen
-#> [1] 1.00 1.00 0.00 0.10 0.40 0.48
+## And the decimal snellen notation, so much loved in Germany
+to_snellen(x, type = "dec") 
+#> From etdrs
+#> [1] "0.062" "0.25"  "0.625" "0.3"
 
-## or evaluating them as logmar values 
-va(x, logmarstep = TRUE)
-#> x: from snellen
-#> [1]  1.00  0.98  0.00 -0.04  0.46  0.36
+## Remove weird entries and implausible entries depending on the VA choice
+x <- c("NLP", "0.8", "34", "3/60", "2/200", "20/50", "  ", ".", "-", "NULL")
 
-## on the inbuilt data set:
-head(va(amd$VA_ETDRS_Letters), 10) 
-#> Warning: amd$VA_ETDRS_Letters (from etdrs): NA introduced - implausible values
-#>  [1] 0.82 0.08 0.70 0.90 1.06 1.02 0.96 1.06 0.40 0.46
+to_snellen(x)
+#> From snellen. Could be snellen, logmar, snellendec, etdrs
+#> 6x NA introduced for: 0.8, 34,   , ., -, NULL
+#>  [1] "20/20000" NA         NA         "20/400"   "20/2000"  "20/50"   
+#>  [7] NA         NA         NA         NA
+to_snellen(x, from = "snellendec")
+#> 8x NA introduced for: 34, 3/60, 2/200, 20/50,   , ., -, NULL
+#>  [1] "20/20000" "20/25"    NA         NA         NA         NA        
+#>  [7] NA         NA         NA         NA
+to_snellen(x, from = "etdrs")
+#> 8x NA introduced for: 0.8, 3/60, 2/200, 20/50,   , ., -, NULL
+#>  [1] "20/20000" NA         "20/200"   NA         NA         NA        
+#>  [7] NA         NA         NA         NA
+to_snellen(x, from = "logmar")
+#> 8x NA introduced for: 34, 3/60, 2/200, 20/50,   , ., -, NULL
+#>  [1] "20/20000" "20/125"   NA         NA         NA         NA        
+#>  [7] NA         NA         NA         NA
 
-## and indeed, there are unplausible ETDRS values in this data set:
-range(amd$VA_ETDRS_Letters)
-#> [1]   0 105
+## "plus/minus" entries are converted to the most probable threshold (any spaces allowed) 
+x <- c("20/200 - 1", "6/6-2", "20/50 + 3", "6/6-4", "20/33 + 4")
+to_logmar(x)
+#> From snellen
+#> [1] 1.0 0.0 0.3 0.1 0.1
+
+## or evaluating them as logmar values (each optotype equals 0.02 logmar)
+to_logmar(x, smallstep = TRUE)
+#> From snellen
+#> [1] 1.02 0.04 0.34 0.08 0.14
+
+## or you can also decide to completely ignore them (converting them to the nearest snellen value in the VA chart)
+to_snellen(x, noplus = TRUE)
+#> From snellen
+#> [1] "20/200" "20/20"  "20/50"  "20/20"  "20/32"
+
+# terribly mixed notations
+x <- c(NA, "nlp", 1:2, 1.1, -1, "20/40", "4/6", "6/1000", 34)
+va_mixed(x, to = "snellen")
+#>  [1] NA         "20/20000" "20/2000"  "20/2000"  "20/250"   NA        
+#>  [7] "20/40"    "20/32"    "20/4000"  "20/200"
+
+# "I only have snellen and snellen decimal notation in my data"
+va_mixed(x, to = "snellen", possible = c("snellen", "snellendec"))
+#>  [1] NA         "20/20000" "20/20"    "20/10"    "20/20"    NA        
+#>  [7] "20/40"    "20/32"    "20/4000"  NA
+
+# "I have snellen, logmar and etdrs in my data, and there is no etdrs value less than 4"
+va_mixed(x, to = "snellen", possible = c("snellen", "logmar", "etdrs"))
+#>  [1] NA         "20/20000" "20/200"   "20/2000"  "20/250"   NA        
+#>  [7] "20/40"    "20/32"    "20/4000"  "20/200"
 ```
 
-### eyes
+### Count patients and eyes
 
-Count patient and eyes (**eyes** or **eyestr**)
+Use `eyes` to return a vector, and `eyestr` to return a string for your
+report.
 
 ``` r
-eyes(amd)
-#> Eyes coded 0:1. Interpreting r = 0
+library(eyedata)
+eyes(amd2)
 #> patients     eyes    right     left 
 #>     3357     3357     1681     1676
-```
 
-#### eyestr
-
-Same as `eyes`, but as text for reports
-
-``` r
-eyestr(amd)
+# Same as `eyes`, but as text for reports
+eyestr(amd2)
 #> [1] "3357 eyes of 3357 patients"
- 
- ## Numbers smaller than or equal to 12 will be real English
-eyestr(head(amd, 100))
+
+## Numbers smaller than or equal to 12 will be real English
+eyestr(head(amd2, 100))
 #> [1] "Eleven eyes of eleven patients"
 ```
 
-### recodeye
+### Recoding the eye variable
 
 Makes recoding eye variables very easy. It deals with weird missing
 entries like `"."` and `""`, or `"N/A"`
@@ -143,36 +162,99 @@ x <- c("r", "re", "od", "right", "l", "le", "os", "left")
 recodeye(x)
 #> [1] "r" "r" "r" "r" "l" "l" "l" "l"
 
+## or with "both eyes"
+x <- c(x, "both", "ou")
+recodeye(x)
+#>  [1] "r" "r" "r" "r" "l" "l" "l" "l" "b" "b"
+
+## chose the resulting codes
+recodeye(x, to = c("od", "os", "ou"))
+#>  [1] "od" "od" "od" "od" "os" "os" "os" "os" "ou" "ou"
+
 ## Numeric codes 0:1/ 1:2 are recognized 
 x <- 1:2
 recodeye(x)
 #> Eyes coded 1:2. Interpreting r = 1
 #> [1] "r" "l"
 
-## chose the resulting codes
-recodeye(x, to = c("right", "left"))
-#> Eyes coded 1:2. Interpreting r = 1
-#> [1] "right" "left"
-
-## or, if right is coded with 2)
-recodeye(x, numcode = 2:1)
-#> Eyes coded 2:1 with r = 2
-#> [1] "l" "r"
-
 ## with weird missing values
 x <- c(1:2, ".", NA, "", "    ")
 recodeye(x)
+#> Missing values and/or meaningless strings contained
 #> Eyes coded 1:2. Interpreting r = 1
 #> [1] "r" "l" NA  NA  NA  NA
 
 ## Or if you have weird codes for eyes
 x <- c("alright", "righton", "lefty","leftover")
 
-recodeye(x, eyecodes = list(c("alright","righton"), c("lefty","leftover")))
+recodeye(x, eyecodes = list(r = c("alright","righton"), l = c("lefty","leftover")))
 #> [1] "r" "r" "l" "l"
 ```
 
-### myop - Make your data long
+### Clean NA entries
+
+``` r
+x <- c("a", "   ", ".", "-", "NULL")
+tidyNA(x)
+#> [1] "a" NA  NA  NA  NA
+
+# in addition to the default strings, a new string can be added
+tidyNA(x, string = "a")
+#> [1] NA NA NA NA NA
+
+# or just remove the strings you want
+tidyNA(x, string = "a", defaultstrings = FALSE)
+#> [1] NA     "   "  "."    "-"    "NULL"
+```
+
+### reveal
+
+Show common statistics for all numeric columns, for the entire cohort or
+aggregated by group(s):
+
+``` r
+reveal(iris)
+#>            var mean  sd   n min max
+#> 1 Sepal.Length  5.8 0.8 150 4.3 7.9
+#> 2  Sepal.Width  3.1 0.4 150 2.0 4.4
+#> 3 Petal.Length  3.8 1.8 150 1.0 6.9
+#> 4  Petal.Width  1.2 0.8 150 0.1 2.5
+#> 5      Species  2.0 0.8 150 1.0 3.0
+
+reveal(iris, by = "Species") #can be several groups
+#>       Species          var mean  sd  n min max
+#> 1      setosa Sepal.Length  5.0 0.4 50 4.3 5.8
+#> 2      setosa  Sepal.Width  3.4 0.4 50 2.3 4.4
+#> 3      setosa Petal.Length  1.5 0.2 50 1.0 1.9
+#> 4      setosa  Petal.Width  0.2 0.1 50 0.1 0.6
+#> 5  versicolor Sepal.Length  5.9 0.5 50 4.9 7.0
+#> 6  versicolor  Sepal.Width  2.8 0.3 50 2.0 3.4
+#> 7  versicolor Petal.Length  4.3 0.5 50 3.0 5.1
+#> 8  versicolor  Petal.Width  1.3 0.2 50 1.0 1.8
+#> 9   virginica Sepal.Length  6.6 0.6 50 4.9 7.9
+#> 10  virginica  Sepal.Width  3.0 0.3 50 2.2 3.8
+#> 11  virginica Petal.Length  5.6 0.6 50 4.5 6.9
+#> 12  virginica  Petal.Width  2.0 0.3 50 1.4 2.5
+```
+
+### getage
+
+  - Calculate age in years, as [periods or
+    durations](https://lubridate.tidyverse.org/articles/lubridate.html#time-intervals)
+
+<!-- end list -->
+
+``` r
+dob <- c("1984-10-16", "2000-01-01")
+
+## If no second date given, the age today
+getage(dob)
+#> [1] 36.2 21.0
+getage(dob, "2000-01-01")                                                    
+#> [1] 15.2  0.0
+```
+
+### myop
 
 Often enough, there are right eye / left eye columns for more than one
 variable, e.g., for both IOP and VA. This may be a necessary data formal
@@ -285,10 +367,12 @@ codes**](#names-and-codes)
 
 ``` r
 blink(wide_df)
-#> va_preop: from etdrs
-#> va_postop: from etdrs
+#> The lifecycle of blink() has expired. It will no longer be
+#>   maintained, but will be kept in the package.
+#> From etdrs
+#> From etdrs
 #> 
-#> ── blink ─────────────────────────────────────────────────
+#> ── blink ───────────────────────────────────────────────────────────────────────
 #> ══ Data ════════════════════════════════
 #> # A tibble: 8 x 7
 #>   id    eye   surgery iop_preop iop_postop va_preop va_postop
@@ -333,67 +417,6 @@ blink(wide_df)
 #> 2   l iop_postop 12.5 1.3 4  11  14
 #> 3   r  iop_preop 22.5 1.3 4  21  24
 #> 4   r iop_postop 12.5 1.3 4  11  14
-```
-
-### reveal
-
-Show common statistics for all numeric columns, for the entire cohort or
-aggregated by group(s):
-
-``` r
-reveal(myop_df)
-#>          var mean  sd n min max
-#> 1  iop_preop 27.5 5.5 8  21  34
-#> 2 iop_postop 12.5 1.2 8  11  14
-#> 3   va_preop 42.5 1.2 8  41  44
-#> 4  va_postop 46.5 1.2 8  45  48
-
-reveal(myop_df, by = "eye")
-#>   eye        var mean  sd n min max
-#> 1   l  iop_preop 32.5 1.3 4  31  34
-#> 2   l iop_postop 12.5 1.3 4  11  14
-#> 3   l   va_preop 42.5 1.3 4  41  44
-#> 4   l  va_postop 46.5 1.3 4  45  48
-#> 5   r  iop_preop 22.5 1.3 4  21  24
-#> 6   r iop_postop 12.5 1.3 4  11  14
-#> 7   r   va_preop 42.5 1.3 4  41  44
-#> 8   r  va_postop 46.5 1.3 4  45  48
-
-reveal(myop_df, by = c("eye", "surgery"))
-#>    eye surgery        var mean  sd n min max
-#> 1    l     SLT  iop_preop 34.0  NA 1  34  34
-#> 2    l     SLT iop_postop 14.0  NA 1  14  14
-#> 3    l     SLT   va_preop 44.0  NA 1  44  44
-#> 4    l     SLT  va_postop 48.0  NA 1  48  48
-#> 5    r     SLT  iop_preop 23.5 0.7 2  23  24
-#> 6    r     SLT iop_postop 13.5 0.7 2  13  14
-#> 7    r     SLT   va_preop 43.5 0.7 2  43  44
-#> 8    r     SLT  va_postop 47.5 0.7 2  47  48
-#> 9    l      TE  iop_preop 32.0 1.0 3  31  33
-#> 10   l      TE iop_postop 12.0 1.0 3  11  13
-#> 11   l      TE   va_preop 42.0 1.0 3  41  43
-#> 12   l      TE  va_postop 46.0 1.0 3  45  47
-#> 13   r      TE  iop_preop 21.5 0.7 2  21  22
-#> 14   r      TE iop_postop 11.5 0.7 2  11  12
-#> 15   r      TE   va_preop 41.5 0.7 2  41  42
-#> 16   r      TE  va_postop 45.5 0.7 2  45  46
-```
-
-### age
-
-  - Calculate age in years, as [periods or
-    durations](https://lubridate.tidyverse.org/articles/lubridate.html#time-intervals)
-
-<!-- end list -->
-
-``` r
-dob <- c("1984-10-16", "2000-01-01")
-
-## If no second date given, the age today
-age(dob)
-#> [1] 35.7 20.5
-age(dob, "2000-01-01")                                                    
-#> [1] 15.2  0.0
 ```
 
 ## Names and codes
@@ -459,7 +482,8 @@ OK names (`eye` will work)
 ## BUT: 
 ## The names are quite long 
 ## There is an unnecessary underscore (etdrs are always letters). Better just "VA"
-names(amd) 
+c("Id", "Eye", "FollowupDays", "BaselineAge", "Gender", "VA_ETDRS_Letters", 
+"InjectionNumber")
 #> [1] "Id"               "Eye"              "FollowupDays"     "BaselineAge"     
 #> [5] "Gender"           "VA_ETDRS_Letters" "InjectionNumber"
 
@@ -535,55 +559,15 @@ an unfortunate shape for which `eye` may not be suitable.
   - Categories **(no) light perception** are converted following the
     suggestions by Michael Bach
 
-### VA conversion chart
-
-This chart is included in the package
-(`va_chart`)
-
-<div style="font-size:8 pt;">
-
-| Snellen feet | Snellen meter | Snellen decimal | logMAR | ETDRS | Categories |
-| ------------ | ------------- | --------------- | ------ | ----- | ---------- |
-| 20/20000     | 6/6000        | 0.001           | 3      | 0     | NLP        |
-| 20/10000     | 6/3000        | 0.002           | 2.7    | 0     | LP         |
-| 20/4000      | 6/1200        | 0.005           | 2.3    | 0     | HM         |
-| 20/2000      | 6/600         | 0.01            | 1.9    | 2     | CF         |
-| 20/800       | 6/240         | 0.025           | 1.6    | 5     | NA         |
-| 20/630       | 6/190         | 0.032           | 1.5    | 10    | NA         |
-| 20/500       | 6/150         | 0.04            | 1.4    | 15    | NA         |
-| 20/400       | 6/120         | 0.05            | 1.3    | 20    | NA         |
-| 20/320       | 6/96          | 0.062           | 1.2    | 25    | NA         |
-| 20/300       | 6/90          | 0.067           | 1.18   | 26    | NA         |
-| 20/250       | 6/75          | 0.08            | 1.1    | 30    | NA         |
-| 20/200       | 6/60          | 0.1             | 1.0    | 35    | NA         |
-| 20/160       | 6/48          | 0.125           | 0.9    | 40    | NA         |
-| 20/125       | 6/38          | 0.16            | 0.8    | 45    | NA         |
-| 20/120       | 6/36          | 0.167           | 0.78   | 46    | NA         |
-| 20/100       | 6/30          | 0.2             | 0.7    | 50    | NA         |
-| 20/80        | 6/24          | 0.25            | 0.6    | 55    | NA         |
-| 20/70        | 6/21          | 0.29            | 0.54   | 58    | NA         |
-| 20/63        | 6/19          | 0.32            | 0.5    | 60    | NA         |
-| 20/60        | 6/18          | 0.33            | 0.48   | 61    | NA         |
-| 20/50        | 6/15          | 0.4             | 0.4    | 65    | NA         |
-| 20/40        | 6/12          | 0.5             | 0.3    | 70    | NA         |
-| 20/32        | 6/9.6         | 0.625           | 0.2    | 75    | NA         |
-| 20/30        | 6/9           | 0.66            | 0.18   | 76    | NA         |
-| 20/25        | 6/7.5         | 0.8             | 0.1    | 80    | NA         |
-| 20/20        | 6/6           | 1.0             | 0.0    | 85    | NA         |
-| 20/16        | 6/5           | 1.25            | \-0.1  | 90    | NA         |
-| 20/15        | 6/4.5         | 1.33            | \-0.12 | 91    | NA         |
-| 20/13        | 6/4           | 1.5             | \-0.2  | 95    | NA         |
-| 20/10        | 6/3           | 2.0             | \-0.3  | 100   | NA         |
-
-</div>
-
 ## Acknowledgements
 
   - Thanks to **Alasdair Warwick**, **Aaron Lee**, **Tim Yap**,
     **Siegfried Wagner** and **Abraham Olvera** for great suggestions,
-    testing and code review.
+    testing and code review.  
+  - **Pearse Keane**, **Dun Jack Fu**, **Katrin Fasler** and **Christoph
+    Kern** for their contribution of open source data
   - Thanks to [Antoine Fabri](https://github.com/moodymudskipper) for
-    his contribution to `age()`
+    his contribution to `getage()`
   - Thanks to Hadley Wickham and all developers of the `tidyverse`
     packages and the packages `roxygen2`, `usethis`, `testthis` and
     `devtools`, all on which `eye` heavily relies.
@@ -592,7 +576,7 @@ This chart is included in the package
 
   - [Michael Bach’s homepage](https://michaelbach.de/sci/acuity.html)
   - [Michael Bach on NLP and
-    LP](https://michaelbach.de/sci/pubs/Bach2007IOVS%20eLetter%20FrACT.pdf)
+    LP](https://michaelbach.de/sci/pubs/Bach2007IOVS_eLetter_FrACT.pdf)
 
 ## References
 
@@ -603,19 +587,8 @@ This chart is included in the package
 Beck, Roy W, Pamela S Moke, Andrew H Turpin, Frederick L Ferris, John
 Paul SanGiovanni, Chris A Johnson, Eileen E Birch, et al. 2003. “A
 Computerized Method of Visual Acuity Testing.” *American Journal of
-Ophthalmology* 135 (2). Elsevier BV: 194–205.
+Ophthalmology* 135 (2): 194–205.
 <https://doi.org/10.1016/s0002-9394(02)01825-1>.
-
-</div>
-
-<div id="ref-fasler">
-
-Fasler, Katrin, Gabriella Moraes, Siegfried Wagner, Karsten U Kortuem,
-Reena Chopra, Livia Faes, Gabriella Preston, et al. 2019. “One- and
-Two-Year Visual Outcomes from the Moorfields Age-Related Macular
-Degeneration Database: A Retrospective Cohort Study and an Open Science
-Resource.” *BMJ Open* 9 (6). British Medical Journal Publishing Group.
-<https://doi.org/10.1136/bmjopen-2018-027441>.
 
 </div>
 
@@ -623,8 +596,7 @@ Resource.” *BMJ Open* 9 (6). British Medical Journal Publishing Group.
 
 Gregori, Ninel Z, William Feuer, and Philip J Rosenfeld. 2010. “Novel
 Method for Analyzing Snellen Visual Acuity Measurements.” *Retina* 30
-(7). Ovid Technologies (Wolters Kluwer Health): 1046–50.
-<https://doi.org/10.1097/iae.0b013e3181d87e04>.
+(7): 1046–50. <https://doi.org/10.1097/iae.0b013e3181d87e04>.
 
 </div>
 

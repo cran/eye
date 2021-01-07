@@ -29,7 +29,35 @@ getElem_id <- function(obj, id_chr) {
   }
   pat_col
 }
-#' eyecols
+
+#' @name getElem
+#' @param obj can be vector, data frame or list
+#' @param eye_chr strings to identify ID colums.
+#' @description Finds the element in an object for one of the following:
+#'  - ID column
+#'  - eye column
+#'  - columns that contain information for right/left eyes
+#'  - Visual acuity
+#'
+#' `getElem` search a vector, the column names (data frame) or the names (list)
+#' @keywords internal
+#' @return vector
+#' @family string matching functions
+#'
+getElem_eyecol <- function(obj) {
+  if (inherits(obj, "data.frame")) {
+    obj <- colnames(obj)
+  }
+
+  if (any(grepl("(?<![a-z])(eye|eyes)(?![a-z])", obj, perl = TRUE,
+                ignore.case = TRUE))){
+    eye_col <- whole_str(c("eye","eyes"))(obj)
+  } else {
+    eye_col <- part_str("eye")(obj)
+  }
+  eye_col
+}
+
 #' @rdname getElem
 #' @param eye_chr named list with strings for "r" and "l"
 #' names have to be "r" and "l"!

@@ -6,74 +6,78 @@ knitr::opts_chunk$set(
 
 ## ----setup--------------------------------------------------------------------
 library(eye)
+library(eyedata)
 
 ## ----va-----------------------------------------------------------------------
 ## automatic detection of VA notation and converting to logMAR by default
 x <- c(23, 56, 74, 58) ## ETDRS letters
-va(x)
+to_logmar(x) # wrapper of va(x, to = "logmar")
 
-va(x, to = "snellen") ## ... or convert to snellen
+## ... or convert to snellen
+to_snellen(x) # wrapper of va(x, to = "snellen") 
 
-## A mix of notations
-x <- c("NLP", "0.8", "34", "3/60", "2/200", "20/50")
-va(x)
+## eye knows metric as well 
+to_snellen(x, type = "m") 
 
-## "plus/minus" entries are converted to the most probable threshold (any spaces allowed)
-x <- c("20/200", "20/200 - 1", "6/6", "6/6-2", "20/50 + 3", "20/50 -2")
-va(x)
+## And the decimal snellen notation, so much loved in Germany
+to_snellen(x, type = "dec") 
 
-## or evaluating them as logmar values 
-va(x, logmarstep = TRUE)
+## Remove weird entries and implausible entries depending on the VA choice
+x <- c("NLP", "0.8", "34", "3/60", "2/200", "20/50", "  ", ".", "-", "NULL")
 
-## on the inbuilt data set:
-head(va(amd$VA_ETDRS_Letters), 10) 
+to_snellen(x)
+to_snellen(x, from = "snellendec")
+to_snellen(x, from = "etdrs")
+to_snellen(x, from = "logmar")
 
-## and indeed, there are unplausible ETDRS values in this data set:
-range(amd$VA_ETDRS_Letters)
+## "plus/minus" entries are converted to the most probable threshold (any spaces allowed) 
+x <- c("20/200 - 1", "6/6-2", "20/50 + 3", "6/6-4", "20/33 + 4")
+to_logmar(x)
 
-## Any fraction is possible, and empty values
-x <- c("CF", "3/60", "2/200", "", "20/40+3", ".", "      ")
-va(x)
+## or evaluating them as logmar values (each optotype equals 0.02 logmar)
+to_logmar(x, smallstep = TRUE)
 
-## but not when converting from one class to the other
-x <- c("3/60", "2/200", "6/60", "20/200", "6/9")
-va(x, to="snellen", type = "m")
+## or you can also decide to completely ignore them (converting them to the nearest snellen value in the VA chart)
+to_snellen(x, noplus = TRUE)
 
 ## -----------------------------------------------------------------------------
 x <- c("r", "re", "od", "right", "l", "le", "os", "left")
 recodeye(x)
 
-## chose the resulting codes
-recodeye(x, to = c("right", "left"))
+## or with "both eyes"
+x <- c(x, "both", "ou")
+recodeye(x)
 
-## Or if you have weird codes for eyes
-x <- c("alright", "righton", "lefty","leftover")
-recodeye(x, eyecodes = list(c("alright","righton"), c("lefty","leftover")))
+## chose the resulting codes
+recodeye(x, to = c("od", "os", "ou"))
 
 ## Numeric codes 0:1/ 1:2 are recognized 
 x <- 1:2
 recodeye(x)
 
-## chose the resulting codes
-recodeye(x, to = c("right", "left"))
+## with weird missing values
+x <- c(1:2, ".", NA, "", "    ")
+recodeye(x)
 
-## or, if right is coded with 2)
-recodeye(x, numcode = 2:1)
+## Or if you have weird codes for eyes
+x <- c("alright", "righton", "lefty","leftover")
+
+recodeye(x, eyecodes = list(r = c("alright","righton"), l = c("lefty","leftover")))
 
 ## ----eyestr-------------------------------------------------------------------
-eyes(amd)
+eyes(amd2)
 
 ## or as text for a report
-eyestr(amd)
+eyestr(amd2)
 
 ## Complying with journal standards when at beginning of paragraph
-eyestr(amd, para = TRUE)
+eyestr(amd2, para = TRUE)
  
 ## Numbers smaller than or equal to 12 will be real English
-eyestr(head(amd, 100))
+eyestr(head(amd2, 100))
 
 ## But you can turn this off
-eyestr(head(amd, 100), small_num = FALSE)
+eyestr(head(amd2, 100), small_num = FALSE)
 
 ## -----------------------------------------------------------------------------
 ## the variable has not been exactly named, (but it is probably IOP data), 
@@ -139,7 +143,8 @@ names(iop_wide)
 ## BUT: 
 ## The names are quite long 
 ## There is an unnecessary underscore (etdrs are always letters). Better just "VA"
-names(amd) 
+c("Id", "Eye", "FollowupDays", "BaselineAge", "Gender", "VA_ETDRS_Letters", 
+"InjectionNumber")
 
 ## All names are commonly used (good!)
 ## But which dimension of "r"/"l" are we exactly looking at? 
@@ -165,12 +170,12 @@ reveal(clean_df, by = "eye")
 
 reveal(clean_df, by = c("eye", "surgery"))
 
-## ----age, warning=FALSE, message=FALSE----------------------------------------
+## ----getage, warning=FALSE, message=FALSE-------------------------------------
 dob <- c("1984-10-16", "2000-01-01")
 
 ## If no second date given, the age today
-age(dob)
+getage(dob)
 
 ## If the second argument is specified, the age until then
-age(dob, "2000-01-01")                                                    
+getage(dob, "2000-01-01")                                                    
 

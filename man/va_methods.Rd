@@ -4,37 +4,43 @@
 \alias{va_methods}
 \alias{convertVA}
 \alias{convertVA.quali}
+\alias{convertVA.snellendec}
 \alias{convertVA.snellen}
 \alias{convertVA.logmar}
 \alias{convertVA.etdrs}
 \alias{convertVA.default}
 \title{VA conversion methods}
 \usage{
-convertVA(x, to, ...)
+convertVA(x, ...)
 
-\method{convertVA}{quali}(x, to, snellnot, ...)
+\method{convertVA}{quali}(x, to, type, ...)
 
-\method{convertVA}{snellen}(x, to, snellnot, logmarstep, ...)
+\method{convertVA}{snellendec}(x, to, type, ...)
 
-\method{convertVA}{logmar}(x, to, snellnot, ...)
+\method{convertVA}{snellen}(x, to, type, smallstep, noplus, ...)
 
-\method{convertVA}{etdrs}(x, to, snellnot, ...)
+\method{convertVA}{logmar}(x, to, type, ...)
 
-\method{convertVA}{default}(x, to, snellnot, ...)
+\method{convertVA}{etdrs}(x, to, type, ...)
+
+\method{convertVA}{default}(x, to, ...)
 }
 \arguments{
 \item{x}{vector of visual acuities}
 
-\item{to}{to which VA class to convert}
-
 \item{...}{further arguments passed to methods}
 
-\item{snellnot}{which snellen notation. One of "ft", "m" or "dec"}
+\item{to}{to which VA class to convert}
 
-\item{logmarstep}{how plus/minus entries are evaluated. Default to
+\item{type}{which snellen notation. One of "ft", "m" or "dec"}
+
+\item{smallstep}{how plus/minus entries are evaluated. Default to
 increase/decrease snellen fractions by lines. If TRUE, each snellen
 optotype will be considered equivalent to 0.02 logmar or 1 ETDRS
 letter (assuming 5 letters in a row in a chart)}
+
+\item{noplus}{ignoring plus/minus entries and just returning the
+snellen fraction. This overrides the smallstep argument.}
 }
 \value{
 vector with visual acuity of class \code{va}. See also "VA classes"
@@ -53,47 +59,42 @@ VA can be snellen feet/meter/decimal, logMAR, ETDRS, or
 }
 
 Any element which is not recognized will be converted to NA
-
-For other conversion rules see \link{va}
 }
 \section{Conversion}{
 
-Although there seems to be no good statistical reason to convert
-back to Snellen, it is a very natural thing to eye specialists to think
-in Snellen. A conversion to snellen gives a good gauge of how the visual
-acuity for the patients are. However, back-conversion should not be
-considered an exact science and any attempt to use formulas will result
-in very weird Snellen values that have no correspondence to common charts.
-Therefore, Snellen matching the nearest ETDRS and logMAR value in
-the \link{va_chart} are used.
+For other conversion and theory behind conversion rules see \link{va}
+section VA conversion.
+}
 
-Further:
+\section{plus/minus entries}{
+
+The following rules for plus minus notations will be applied:
 \itemize{
-\item logMAR to ETDRS: logMAR rounded to the first digit and converted with
-the chart.
-\item Snellen to logMAR: logMAR = -1 * log10(snellen_frac)
-\item Snellen to ETDRS: ETDRS = 85 + 50 * log10(snellen_frac)
-\href{https://doi.org/10.1097/iae.0b013e3181d87e04}{Gregori et al.}.
-\item ETDRS to logMAR: logMAR = -0.02 * etdrs + 1.7
-\href{https://doi.org/10.1016/s0002-9394(02)01825-1}{Beck et al.}
-}
+\item if entry -2 to +2 : take same Snellen value
+\item if < -2 : take Snellen value one line below
+\item if > +2: Snellen value one line above
 }
 
-\section{VA classes}{
-
-convert_VA returns a vector of three classes:
-\enumerate{
-\item \code{va}
-\item One of \code{snellen}, \code{logmar}, \code{etdrs} or \code{quali}.
-\item Either of \code{character} (for Snellen and qualitative),
-\code{numeric} (for logMAR), or \code{integer} (for ETDRS).
-}
+Snellen are unfortunately often entered with "+/-", which is a
+violation of a psychophysical method designed to assign one
+unambiguous value to visual acuity, with
+non-arbitrary thresholds based on psychometric functions. Therefore,
+transforming "+/-" notation to actual results is in itself
+problematic and the below suggestion to convert it will remain an
+approximation to the most likely "true" result. Even more so, as the
+given conditions should work for charts with
+4 or 5 optotypes in a line, and visual acuity is not always tested
+on such charts. Yet, I believe that the approach is still better than
+just omitting the letters or (worse) assigning a missing value to those
+entries.
 }
 
 \seealso{
 Other VA converter: 
+\code{\link{VAwrapper}},
+\code{\link{plausibility_methods}},
 \code{\link{snellen_steps}},
-\code{\link{va_dissect}()},
+\code{\link{va_mixed}()},
 \code{\link{va}()},
 \code{\link{which_va}()}
 }

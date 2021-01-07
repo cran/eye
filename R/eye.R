@@ -7,15 +7,15 @@
 #'   in ophthalmic research.
 #'
 #' - Visual acuity conversion for snellen, logMAR and ETDRS [`va`]
+#' and the wrapper [to_snellen], [to_etdrs] and [to_logmar]
 #' - Counting patients and eyes [`eyes`]
 #' - Recode eye strings [`recodeye`]
 #' - Reshape eye specific variables [`myop`] and [`hyperop`]
 #' - Summarizing data with common statistics (mean, sd, n, range)[`reveal`]
 #' - Easy summary of your eye data in one blink [`blink`]
 #'
-#'  *eye* contains a real life data set [`eye::amd`]
 #' @section Beyond ophthalmology:
-#' - [`age`]: Calculate age
+#' - [`getage`]: Calculate age
 #' @docType package
 #' @keywords internal
 #' @seealso

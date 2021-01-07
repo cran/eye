@@ -13,20 +13,19 @@ See more with \emph{eye}
 in ophthalmic research.
 \itemize{
 \item Visual acuity conversion for snellen, logMAR and ETDRS \code{\link{va}}
+and the wrapper \link{to_snellen}, \link{to_etdrs} and \link{to_logmar}
 \item Counting patients and eyes \code{\link{eyes}}
 \item Recode eye strings \code{\link{recodeye}}
 \item Reshape eye specific variables \code{\link{myop}} and \code{\link{hyperop}}
 \item Summarizing data with common statistics (mean, sd, n, range)\code{\link{reveal}}
 \item Easy summary of your eye data in one blink \code{\link{blink}}
 }
-
-\emph{eye} contains a real life data set \code{\link[eye:amd]{eye::amd}}
 }
 
 \section{Beyond ophthalmology}{
 
 \itemize{
-\item \code{\link{age}}: Calculate age
+\item \code{\link{getage}}: Calculate age
 }
 }
 

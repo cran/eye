@@ -7,9 +7,9 @@
 \format{
 A data frame with 29 rows and 5 variables:
 \describe{
-\item{snellen_ft}{snellen VA in feet}
-\item{snellen_m}{snellen VA in meter}
-\item{snellen_dec}{decimal snellen VA}
+\item{snellenft}{snellen VA in feet}
+\item{snellenm}{snellen VA in meter}
+\item{snellendec}{decimal snellen VA}
 \item{logmar}{logMAR VA}
 \item{etdrs}{VA in ETDRS letters}
 \item{quali}{VA categories}
@@ -28,14 +28,14 @@ counting fingers). Further details for conversion used can be found in
 \seealso{
 \itemize{
 \item This chart and VA conversion formulas are based on charts in
-\href{https://doi.org/10.1016/j.jcrs.2004.01.014}{Holladay et al.},
-\href{https://doi.org/10.1016/s0002-9394(02)01825-1}{Beck et al.}, and
-\href{https://doi.org/10.1097/iae.0b013e3181d87e04}{Gregori et al.}.
+Holladay et al.\doi{10.1016/j.jcrs.2004.01.014}, Beck et al.
+\doi{10.1016/s0002-9394(02)01825-1}{Beck et al.}, and
+Gregori et al.\doi{10.1097/iae.0b013e3181d87e04}.
 }
 
 Categories \strong{(no) light perception},  \strong{counting fingers}
 and \strong{hand movements} are converted following
-\href{https://doi.org/10.1167/iovs.05-0981}{Schulze-Bonsel et al.}
+Schulze-Bonsel et al. (https://doi.org/10.1167/iovs.05-0981)
 and \href{https://michaelbach.de/sci/acuity.html}{Michael Bach's suggestions}
 }
 \keyword{datasets}
