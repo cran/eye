@@ -38,7 +38,7 @@ between Snellen (decimal, meter and feet), ETDRS, and logMAR.
 
 \itemize{
 \item \strong{logMAR to ETDRS}: logMAR rounded to the first digit and converted with
-the visual acuity chart \link{va_chart}.
+the visual acuity chart (see section VA chart)
 \item \strong{Snellen to logMAR}: logMAR = -1 * log10(snellen_frac)
 \item \strong{Snellen to ETDRS}: ETDRS = 85 + 50 * log10(snellen_frac)
 \doi{10.1097/iae.0b013e3181d87e04}
@@ -48,6 +48,18 @@ Beck et al. \doi{10.1016/s0002-9394(02)01825-1}
 Schulze-Bonsel et al. - https://doi.org/10.1167/iovs.05-0981
 \item \strong{(No) light perception} are converted following the suggestions by
 \href{https://michaelbach.de/sci/acuity.html}{Michael Bach}
+}
+}
+
+\section{Qualitative visual acuity entries}{
+
+In order to calculate with qualitative entries counting fingers,
+hand movement and (no) perception of light, \strong{use logMAR} !
+Qualitative visual acuity lower than counting fingers is assigned 0
+ETDRS letter, in order to keep it as a measurement (not: NA). It is very
+difficult to justify a "negative" letter score in a test which only has
+a specific range (0-100).
+\itemize{
 \item \strong{To Snellen}:
 Although there seems to be no good statistical reason to convert
 back to Snellen, it is a very natural thing to eye specialists to think
@@ -56,8 +68,20 @@ acuity for the patients are. However, back-conversion should not be
 considered an exact science and any attempt to use formulas will result
 in very weird Snellen values that have no correspondence to common charts.
 Therefore, Snellen matching the nearest ETDRS and logMAR value in
-the \link{va_chart} are used.
+the VA chart are used.
 }
+}
+
+\section{VA chart}{
+
+You can find with eye:::va_chart.
+This chart and VA conversion formulas are based on charts in
+Holladay et al.\doi{10.1016/j.jcrs.2004.01.014}, Beck et al.
+\doi{10.1016/s0002-9394(02)01825-1}{Beck et al.}, and
+Gregori et al.\doi{10.1097/iae.0b013e3181d87e04}.
+The etdrs values for NLP and PL are deliberately set at those values because
+they are unlikely to happen by chance as a wrong entry (and as integers),
+and it has internal reasons that make conversion easier.
 }
 
 \section{Accepted VA formats / Plausibility checks}{

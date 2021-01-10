@@ -18,7 +18,7 @@
 #' @name va
 #' @section VA conversion:
 #' - **logMAR to ETDRS**: logMAR rounded to the first digit and converted with
-#' the visual acuity chart [va_chart].
+#' the visual acuity chart (see section VA chart)
 #' - **Snellen to logMAR**: logMAR = -1 * log10(snellen_frac)
 #' - **Snellen to ETDRS**: ETDRS = 85 + 50 * log10(snellen_frac)
 #' \doi{10.1097/iae.0b013e3181d87e04}
@@ -28,6 +28,14 @@
 #' Schulze-Bonsel et al. - https://doi.org/10.1167/iovs.05-0981
 #' - **(No) light perception** are converted following the suggestions by
 #' [Michael Bach](https://michaelbach.de/sci/acuity.html)
+#' @section Qualitative visual acuity entries:
+#' In order to calculate with qualitative entries counting fingers,
+#' hand movement and (no) perception of light, **use logMAR** !
+#' Qualitative visual acuity lower than counting fingers is assigned 0
+#' ETDRS letter, in order to keep it as a measurement (not: NA). It is very
+#' difficult to justify a "negative" letter score in a test which only has
+#' a specific range (0-100).
+#'
 #' - **To Snellen**:
 #' Although there seems to be no good statistical reason to convert
 #' back to Snellen, it is a very natural thing to eye specialists to think
@@ -36,8 +44,16 @@
 #' considered an exact science and any attempt to use formulas will result
 #' in very weird Snellen values that have no correspondence to common charts.
 #' Therefore, Snellen matching the nearest ETDRS and logMAR value in
-#' the [va_chart] are used.
-#'
+#' the VA chart are used.
+#' @section VA chart:
+#' You can find with eye:::va_chart.
+#' This chart and VA conversion formulas are based on charts in
+#' Holladay et al.\doi{10.1016/j.jcrs.2004.01.014}, Beck et al.
+#' \doi{10.1016/s0002-9394(02)01825-1}{Beck et al.}, and
+#' Gregori et al.\doi{10.1097/iae.0b013e3181d87e04}.
+#' The etdrs values for NLP and PL are deliberately set at those values because
+#' they are unlikely to happen by chance as a wrong entry (and as integers),
+#' and it has internal reasons that make conversion easier.
 #' @section Accepted VA formats / Plausibility checks:
 #' - Snellen fractions (meter/ feet) need to be entered as fraction with
 #' "/". Any fractions allowed. You can get creative with your snellens.
@@ -162,16 +178,19 @@ va <- function(x, from = NULL, to = NULL, type = "ft",
         va_class <- guess_va[1]
       }
     }
-  }
-  x_noquali <- convertQuali(x_clean, to_class = va_class)
-  class(x_noquali) <- va_class
-  x_plausible <- checkVA(x_noquali)
+    }
+  class(x_clean) <- c(va_class, class(x_clean))
 
+  x_noquali <- convertQuali(x_clean, to_class = va_class)
+
+  class(x_noquali) <- va_class
+
+  x_plausible <- checkVA(x_noquali)
   newNA <- as.logical(is.na(x_plausible) - is.na(x))
   introduceNA(x, newNA)
 
-  x_final <- convertVA(x_plausible,
-    to = to, type = type,
+  x_final <- convertVA(
+    x_plausible, to = to, type = type,
     smallstep = smallstep, noplus = noplus
   )
   x_final
