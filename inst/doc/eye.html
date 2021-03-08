@@ -12,7 +12,7 @@
 
 <meta name="author" content="Tjebo Heeren" />
 
-<meta name="date" content="2021-01-09" />
+<meta name="date" content="2021-03-08" />
 
 <title>eye</title>
 
@@ -32,45 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-<style type="text/css">
-a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
-a.anchor-section::before {content: '#';}
-.hasAnchor:hover a.anchor-section {visibility: visible;}
-</style>
-<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
-document.addEventListener('DOMContentLoaded', function() {
-  // Do nothing if AnchorJS is used
-  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
-    return;
-  }
-
-  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
-  // Do nothing if sections are already anchored
-  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
-    return null;
-  }
-
-  // Use section id when pandoc runs with --section-divs
-  const section_id = function(x) {
-    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
-            ? x.id : '');
-  };
-
-  // Add anchors
-  h.forEach(function(x) {
-    const id = x.id || section_id(x.parentElement);
-    if (id === '') {
-      return null;
-    }
-    let anchor = document.createElement('a');
-    anchor.href = '#' + id;
-    anchor.classList = ['anchor-section'];
-    x.classList.add('hasAnchor');
-    x.appendChild(anchor);
-  });
-});
-</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -82,7 +43,14 @@ document.addEventListener('DOMContentLoaded', function() {
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 code.sourceCode > span { display: inline-block; line-height: 1.25; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -170,6 +138,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -367,7 +336,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">eye</h1>
 <h4 class="author">Tjebo Heeren</h4>
-<h4 class="date">2021-01-09</h4>
+<h4 class="date">2021-03-08</h4>
 
 
 
@@ -602,9 +571,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h3>Report:</h3>
 <p><code>eyes</code> also include a convenience function to turn the count into a text. This is intended for integration into rmarkdown reports, or for easy copy / pasting. <code>eyes_to_string()</code> parses the output of <code>eyes</code> into text under the hood. Arguments to <code>eyes_to_string</code> are passed via <strong>…</strong>:</p>
 <ul>
-<li><strong>small_num</strong> If TRUE (default): numbers &lt;= 12 will be printed as words.</li>
-<li><strong>para</strong> If TRUE (not default): Adding “A total of” to comply with most journal standards and to avoid awkward long numbers.</li>
-<li><strong>UK</strong> TRUE: UK style (English) or FALSE (default): US style (American).</li>
+<li><strong>english</strong> Which numbers to be written in plain english: choose “small” for numbers till 12, “all” (all numbers), or “none” (or any other string!) for none</li>
+<li><strong>caps</strong> First number will have capital letter</li>
 </ul>
 <p><strong>eyestr</strong> is a shorthand for <code>eyes(x, report = TRUE)</code>. The name was chosen because it’s a contraction of “eyes” and “strings” and it’s a tiny bit easier to type than “eyetxt”.</p>
 <div id="use-in-rmarkdown" class="section level4">
@@ -626,21 +594,30 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; patients     eyes    right     left </span></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt;     3357     3357     1681     1676</span></span>
 <span id="cb4-4"><a href="#cb4-4"></a></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="co">## or as text for a report</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">eyestr</span>(amd2)</span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; [1] &quot;3357 eyes of 3357 patients&quot;</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="co">## Complying with journal standards when at beginning of paragraph</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="kw">eyestr</span>(amd2, <span class="dt">para =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; [1] &quot;A total of 3357 eyes of 3357 patients&quot;</span></span>
-<span id="cb4-12"><a href="#cb4-12"></a> </span>
-<span id="cb4-13"><a href="#cb4-13"></a><span class="co">## Numbers smaller than or equal to 12 will be real English</span></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="kw">eyestr</span>(<span class="kw">head</span>(amd2, <span class="dv">100</span>))</span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; [1] &quot;Eleven eyes of eleven patients&quot;</span></span>
-<span id="cb4-16"><a href="#cb4-16"></a></span>
-<span id="cb4-17"><a href="#cb4-17"></a><span class="co">## But you can turn this off</span></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="kw">eyestr</span>(<span class="kw">head</span>(amd2, <span class="dv">100</span>), <span class="dt">small_num =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; [1] &quot;11 eyes of 11 patients&quot;</span></span></code></pre></div>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="kw">library</span>(eyedata)</span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">eyes</span>(amd2)</span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; patients     eyes    right     left </span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt;     3357     3357     1681     1676</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># Same as `eyes`, but as text for reports</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="kw">eyestr</span>(amd2)</span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; [1] &quot;3357 eyes of 3357 patients&quot;</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">## Numbers smaller than or equal to 12 will be real English</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="kw">eyestr</span>(<span class="kw">head</span>(amd2, <span class="dv">100</span>))</span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; [1] &quot;eleven eyes of eleven patients&quot;</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">## Or, you can make all numbers english:</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="kw">eyestr</span>(amd2, <span class="dt">english =</span> <span class="st">&quot;all&quot;</span>)</span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; [1] &quot;three thousand three hundred and fifty-seven eyes of three thousand three hundred and fifty-seven patients&quot;</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">## make first number capital letter</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="kw">eyestr</span>(<span class="kw">head</span>(amd2, <span class="dv">100</span>), <span class="dt">caps =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; [1] &quot;Eleven eyes of eleven patients&quot;</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co">## you can have all numbers printed as numbers</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="kw">eyestr</span>(<span class="kw">head</span>(amd2, <span class="dv">100</span>), <span class="dt">english =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; [1] &quot;11 eyes of 11 patients&quot;</span></span></code></pre></div>
 </div>
 </div>
 <div id="reshape-eye-data" class="section level2">
@@ -853,18 +830,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt; ── blink ───────────────────────────────────────────────────────────────────────</span></span>
 <span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt; ══ Data ════════════════════════════════</span></span>
 <span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt; # A tibble: 118,255 x 11</span></span>
-<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt;    patid sex   age   avdays_induc ethnicity loaded  time injgiven va    regimen</span></span>
-<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;fct&gt;        &lt;dbl&gt; &lt;chr&gt;     &lt;lgl&gt;  &lt;int&gt; &lt;lgl&gt;    &lt;log&gt; &lt;chr&gt;  </span></span>
-<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;  1 id_1  m     60-69           28 se_asian  TRUE       0 TRUE     0.30  ranibi…</span></span>
-<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt;  2 id_1  m     60-69           28 se_asian  TRUE      28 TRUE     0.30  ranibi…</span></span>
-<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt;  3 id_1  m     60-69           28 se_asian  TRUE      56 TRUE     0.30  ranibi…</span></span>
-<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt;  4 id_1  m     60-69           28 se_asian  TRUE      91 TRUE     0.40  ranibi…</span></span>
-<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt;  5 id_1  m     60-69           28 se_asian  TRUE     131 TRUE     0.46  ranibi…</span></span>
-<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt;  6 id_1  m     60-69           28 se_asian  TRUE     173 TRUE     0.40  ranibi…</span></span>
-<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt;  7 id_1  m     60-69           28 se_asian  TRUE     236 TRUE     0.50  ranibi…</span></span>
-<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt;  8 id_1  m     60-69           28 se_asian  TRUE     278 TRUE     0.50  ranibi…</span></span>
-<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt;  9 id_1  m     60-69           28 se_asian  TRUE     411 TRUE     0.60  ranibi…</span></span>
-<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt; 10 id_1  m     60-69           28 se_asian  TRUE     453 TRUE     0.54  ranibi…</span></span>
+<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt;    patid sex   age   avdays_induc ethnicity loaded  time injgiven va     regimen</span></span>
+<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;fct&gt;        &lt;dbl&gt; &lt;chr&gt;     &lt;lgl&gt;  &lt;int&gt; &lt;lgl&gt;    &lt;logm&gt; &lt;chr&gt;  </span></span>
+<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;  1 id_1  m     60-69           28 se_asian  TRUE       0 TRUE     0.30   ranibi…</span></span>
+<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt;  2 id_1  m     60-69           28 se_asian  TRUE      28 TRUE     0.30   ranibi…</span></span>
+<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt;  3 id_1  m     60-69           28 se_asian  TRUE      56 TRUE     0.30   ranibi…</span></span>
+<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt;  4 id_1  m     60-69           28 se_asian  TRUE      91 TRUE     0.40   ranibi…</span></span>
+<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt;  5 id_1  m     60-69           28 se_asian  TRUE     131 TRUE     0.46   ranibi…</span></span>
+<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt;  6 id_1  m     60-69           28 se_asian  TRUE     173 TRUE     0.40   ranibi…</span></span>
+<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt;  7 id_1  m     60-69           28 se_asian  TRUE     236 TRUE     0.50   ranibi…</span></span>
+<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt;  8 id_1  m     60-69           28 se_asian  TRUE     278 TRUE     0.50   ranibi…</span></span>
+<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt;  9 id_1  m     60-69           28 se_asian  TRUE     411 TRUE     0.60   ranibi…</span></span>
+<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt; 10 id_1  m     60-69           28 se_asian  TRUE     453 TRUE     0.54   ranibi…</span></span>
 <span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt; # … with 118,245 more rows, and 1 more variable: pre2013 &lt;lgl&gt;</span></span>
 <span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt; </span></span>
 <span id="cb7-77"><a href="#cb7-77"></a><span class="co">#&gt; ══ Count of patient and eyes ═══════════</span></span>
@@ -1042,7 +1019,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb15-2"><a href="#cb15-2"></a></span>
 <span id="cb15-3"><a href="#cb15-3"></a><span class="co">## If no second date given, the age today</span></span>
 <span id="cb15-4"><a href="#cb15-4"></a><span class="kw">getage</span>(dob)</span>
-<span id="cb15-5"><a href="#cb15-5"></a><span class="co">#&gt; [1] 36.2 21.0</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="co">#&gt; [1] 36.4 21.2</span></span>
 <span id="cb15-6"><a href="#cb15-6"></a></span>
 <span id="cb15-7"><a href="#cb15-7"></a><span class="co">## If the second argument is specified, the age until then</span></span>
 <span id="cb15-8"><a href="#cb15-8"></a><span class="kw">getage</span>(dob, <span class="st">&quot;2000-01-01&quot;</span>)                                                    </span>

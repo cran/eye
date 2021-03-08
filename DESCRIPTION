@@ -1,6 +1,6 @@
 Package: eye
 Title: Analysis of Eye Data
-Version: 1.0.1
+Version: 1.1.0
 Authors@R: c(
     person("Tjebo", "Heeren",
            role = c("aut", "cre"),
@@ -37,9 +37,9 @@ Suggests: eyedata (>= 0.1.0), knitr (>= 1.30), rmarkdown (>= 2.5),
         testthat (>= 3.0.0)
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-01-09 15:25:38 UTC; tjebo
+Packaged: 2021-03-08 14:06:54 UTC; tjebo
 Author: Tjebo Heeren [aut, cre] (<https://orcid.org/0000-0001-5297-2301>),
   Antoine Fabri [ctb]
 Maintainer: Tjebo Heeren <tjebo@gmx.de>
 Repository: CRAN
-Date/Publication: 2021-01-10 14:20:02 UTC
+Date/Publication: 2021-03-08 14:22:06 UTC

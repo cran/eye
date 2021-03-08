@@ -67,17 +67,23 @@ recodeye(x, eyecodes = list(r = c("alright","righton"), l = c("lefty","leftover"
 ## ----eyestr-------------------------------------------------------------------
 eyes(amd2)
 
-## or as text for a report
+library(eyedata)
+eyes(amd2)
+
+# Same as `eyes`, but as text for reports
 eyestr(amd2)
 
-## Complying with journal standards when at beginning of paragraph
-eyestr(amd2, para = TRUE)
- 
 ## Numbers smaller than or equal to 12 will be real English
 eyestr(head(amd2, 100))
 
-## But you can turn this off
-eyestr(head(amd2, 100), small_num = FALSE)
+## Or, you can make all numbers english:
+eyestr(amd2, english = "all")
+
+## make first number capital letter
+eyestr(head(amd2, 100), caps = TRUE)
+
+## you can have all numbers printed as numbers
+eyestr(head(amd2, 100), english = "none")
 
 ## -----------------------------------------------------------------------------
 ## the variable has not been exactly named, (but it is probably IOP data), 
