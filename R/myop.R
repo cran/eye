@@ -25,7 +25,7 @@
 #' myop will only recognize meaningful coding for eyes:
 #' - Right eyes: *"r", "re", "od", "right"*
 #' - Left eyes:  *"l", "le", "os", "left"*
-#' - for other codes see also [set_codes]
+#' - for other codes see also [eye_codes]
 #' The strings for eyes need to be **separated by period or underscores**.
 #' (Periods will be replaced by underscores). Any order is allowed.
 #'
@@ -85,18 +85,14 @@ myopic <- myop
 #' @importFrom dplyr mutate_all
 #' @keywords internal
 #' @family myopizer
-
 myop_pivot <- function(x) {
   x_myop <- x %>%
     dplyr::mutate_all(as.character) %>%
     tidyr::pivot_longer(
-      cols = tidyr::matches("^(r|l)_"),
-      names_to = "eyekey",
-      values_to = "new_val_wow"
-    ) %>%
-    tidyr::extract("eyekey", regex = "^(r|l)_(.*)", into = c("eye", "eyekey")) %>%
-    tidyr::pivot_wider(names_from = "eyekey", values_from = "new_val_wow")
-
+      cols = tidyr::matches("^(right|left)_"),
+      names_pattern = "^(right|left)_(.*)",
+      names_to = c("eye", ".value")
+    )
   x_myop
 }
 
@@ -111,14 +107,13 @@ myop_pivot <- function(x) {
 #' @importFrom dplyr mutate_all
 #' @keywords internal
 #' @family myopizer
-
 myop_rename <- function(x) {
   if (any(grepl("\\.", names(x)))) {
     names(x) <- gsub("\\.", "_", names(x))
   }
   name_x <- sort_substr(
     tolower(names(x)),
-    set_codes()[c("r", "l", "iop", "va")]
+    eye_codes[c("right", "left", "iop", "va")]
   )
   name_x
 }
@@ -139,9 +134,9 @@ myop_rename <- function(x) {
 #' @family myopizer
 myopizer <- function(x, var = "value") {
   x_sym <- deparse(substitute(x))
-  ls_eye <- getElem_eye(x)
+  ls_eye <- getElem_eye(names(x))
   eye_cols <- unlist(ls_eye)
-  eye_str <- whole_str(c("eyes", "eye"))(names(x))
+  eye_str <- whole_str(names(x), c("eyes", "eye"))
 
   if (anyDuplicated(x)) {
     which_dupe <- paste(which(duplicated(x) | duplicated(x, fromLast = TRUE)),
@@ -168,4 +163,3 @@ myopizer <- function(x, var = "value") {
   }
   myop_pivot(x)
 }
-

@@ -9,51 +9,30 @@
 \alias{getElem_iop}
 \title{Find element based or strings}
 \usage{
-getElem_id(obj, id_chr)
+getElem_id(obj)
 
 getElem_eyecol(obj)
 
-getElem_eye(obj, eye_chr)
+getElem_eye(obj)
 
-getElem_va(obj, va_chr)
+getElem_va(obj)
 
-getElem_iop(obj, iop_chr)
+getElem_iop(obj)
 }
 \arguments{
 \item{obj}{can be vector, data frame or list}
-
-\item{id_chr}{strings to identify ID colums.}
-
-\item{eye_chr}{named list with strings for "r" and "l"
-names have to be "r" and "l"!}
-
-\item{va_chr}{named list with strings for "whole" and "part"
-names have to be "whole" and "part"!}
-
-\item{iop_chr}{named list with strings for "whole" and "part"
-names have to be "whole" and "part"!}
 }
 \value{
-vector
-
 vector
 }
 \description{
 Finds the element in an object for one of the following:
 \itemize{
-\item ID
-\item eye
-\item Visual acuity
-}
-
-\code{getElem} search a vector, the column names (data frame) or the names (list)
-
-Finds the element in an object for one of the following:
-\itemize{
-\item ID column
-\item eye column
-\item columns that contain information for right/left eyes
-\item Visual acuity
+\item \emph{getElem_id} ID column
+\item \emph{getElem_eyecol} eye column
+\item \emph{getElem_eye} columns that contain information for right/left eyes
+\item \emph{getElem_va} Visual acuity
+\item \emph{getElem_iop} IOP
 }
 
 \code{getElem} search a vector, the column names (data frame) or the names (list)
@@ -61,15 +40,8 @@ Finds the element in an object for one of the following:
 \seealso{
 Other string matching functions: 
 \code{\link{recodeye}()},
-\code{\link{set_codes}()},
 \code{\link{sort_substr}()},
-\code{\link{str_func_facs}}
-
-Other string matching functions: 
-\code{\link{recodeye}()},
-\code{\link{set_codes}()},
-\code{\link{sort_substr}()},
-\code{\link{str_func_facs}}
+\code{\link{str_search}}
 }
 \concept{string matching functions}
 \keyword{internal}

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Tjebo Heeren" />
 
-<meta name="date" content="2021-03-08" />
+<meta name="date" content="2021-03-22" />
 
 <title>eye</title>
 
@@ -336,7 +336,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">eye</h1>
 <h4 class="author">Tjebo Heeren</h4>
-<h4 class="date">2021-03-08</h4>
+<h4 class="date">2021-03-22</h4>
 
 
 
@@ -350,7 +350,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p><em>eye</em> is dedicated to facilitate ophthalmic research, providing convenient application programming interfaces (API) for common tasks:</p>
 <ul>
 <li><a href="#visual-acuity">Handling of visual acuity notations</a></li>
-<li><a href="#count-patients-and-eyes">Easy count of patients and eyes</a>, return a vector or a text for your report</li>
+<li><a href="#count-patients-and-eyes">Easy count of patients and eyes</a></li>
 <li><a href="#recoding-the-eye-variable">Easy recoding of your eye variable</a></li>
 <li>Reshape your eye data - <a href="#myop">long</a> or <a href="#hyperop">wide</a></li>
 <li><a href="#blink">Quick summary of your eye data</a></li>
@@ -496,42 +496,45 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>left eyes: c(“l”, “le”, “os”, “left”) and</li>
 <li>both eyes: c(“b”, “both”, “ou”)</li>
 </ul>
-<p>If you have different codes, you can change the recognized strings with the <code>eyecodes</code> argument, which needs to be a list. But remember to put the strings for right eyes first, or pass a <em>named list</em>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;r&quot;</span>, <span class="st">&quot;re&quot;</span>, <span class="st">&quot;od&quot;</span>, <span class="st">&quot;right&quot;</span>, <span class="st">&quot;l&quot;</span>, <span class="st">&quot;le&quot;</span>, <span class="st">&quot;os&quot;</span>, <span class="st">&quot;left&quot;</span>)</span>
+<p>If you have different codes, you can change the recognized strings with the <code>eyestrings</code> argument, which needs to be a list. But remember to put the strings for right eyes first, or pass a <em>named list</em>.</p>
+<p>You can also more globally change recognized codes with <code>set_eye_strings()</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;r&quot;</span>, <span class="st">&quot;re&quot;</span>, <span class="st">&quot;od&quot;</span>, <span class="st">&quot;right&quot;</span>, <span class="st">&quot;l&quot;</span>, <span class="st">&quot;le&quot;</span>, <span class="st">&quot;os&quot;</span>, <span class="st">&quot;left&quot;</span>, <span class="st">&quot;both&quot;</span>, <span class="st">&quot;ou&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2"></a><span class="kw">recodeye</span>(x)</span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; [1] &quot;r&quot; &quot;r&quot; &quot;r&quot; &quot;r&quot; &quot;l&quot; &quot;l&quot; &quot;l&quot; &quot;l&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt;  [1] &quot;r&quot; &quot;r&quot; &quot;r&quot; &quot;r&quot; &quot;l&quot; &quot;l&quot; &quot;l&quot; &quot;l&quot; &quot;b&quot; &quot;b&quot;</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a></span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="co">## or with &quot;both eyes&quot;</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(x, <span class="st">&quot;both&quot;</span>, <span class="st">&quot;ou&quot;</span>)</span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="kw">recodeye</span>(x)</span>
-<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt;  [1] &quot;r&quot; &quot;r&quot; &quot;r&quot; &quot;r&quot; &quot;l&quot; &quot;l&quot; &quot;l&quot; &quot;l&quot; &quot;b&quot; &quot;b&quot;</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a></span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="co">## chose the resulting codes</span></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="kw">recodeye</span>(x, <span class="dt">to =</span> <span class="kw">c</span>(<span class="st">&quot;od&quot;</span>, <span class="st">&quot;os&quot;</span>, <span class="st">&quot;ou&quot;</span>))</span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt;  [1] &quot;od&quot; &quot;od&quot; &quot;od&quot; &quot;od&quot; &quot;os&quot; &quot;os&quot; &quot;os&quot; &quot;os&quot; &quot;ou&quot; &quot;ou&quot;</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a></span>
-<span id="cb3-14"><a href="#cb3-14"></a><span class="co">## Numeric codes 0:1/ 1:2 are recognized </span></span>
-<span id="cb3-15"><a href="#cb3-15"></a>x &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span></span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="kw">recodeye</span>(x)</span>
-<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; Eyes coded 1:2. Interpreting r = 1</span></span>
-<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; [1] &quot;r&quot; &quot;l&quot;</span></span>
-<span id="cb3-19"><a href="#cb3-19"></a></span>
-<span id="cb3-20"><a href="#cb3-20"></a><span class="co">## with weird missing values</span></span>
-<span id="cb3-21"><a href="#cb3-21"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="st">&quot;.&quot;</span>, <span class="ot">NA</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;    &quot;</span>)</span>
-<span id="cb3-22"><a href="#cb3-22"></a><span class="kw">recodeye</span>(x)</span>
-<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; Missing values and/or meaningless strings contained</span></span>
-<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt; Eyes coded 1:2. Interpreting r = 1</span></span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt; [1] &quot;r&quot; &quot;l&quot; NA  NA  NA  NA</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">## chose the resulting codes</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="kw">recodeye</span>(x, <span class="dt">to =</span> <span class="kw">c</span>(<span class="st">&quot;od&quot;</span>, <span class="st">&quot;os&quot;</span>, <span class="st">&quot;ou&quot;</span>))</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt;  [1] &quot;od&quot; &quot;od&quot; &quot;od&quot; &quot;od&quot; &quot;os&quot; &quot;os&quot; &quot;os&quot; &quot;os&quot; &quot;ou&quot; &quot;ou&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">## Numeric codes 0:1/ 1:2 are recognized </span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>x &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="kw">recodeye</span>(x)</span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt; Eyes coded 1:2. Interpreting r = 1</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt; [1] &quot;r&quot; &quot;l&quot;</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co">## with weird missing values</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="st">&quot;.&quot;</span>, <span class="ot">NA</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;    &quot;</span>)</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="kw">recodeye</span>(x)</span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; Missing values and/or meaningless strings contained</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt; Eyes coded 1:2. Interpreting r = 1</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt; [1] &quot;r&quot; &quot;l&quot; NA  NA  NA  NA</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">## If you are using different strings to code for eyes, e.g., you are using a different language, you can change this either with the &quot;eyestrings&quot; argument</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a>french &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;OD&quot;</span>, <span class="st">&quot;droit&quot;</span>, <span class="st">&quot;gauche&quot;</span>, <span class="st">&quot;OG&quot;</span>)</span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="kw">recodeye</span>(french, <span class="dt">eyestrings =</span> <span class="kw">list</span>(<span class="dt">r =</span> <span class="kw">c</span>(<span class="st">&quot;droit&quot;</span>, <span class="st">&quot;od&quot;</span>), <span class="dt">l =</span> <span class="kw">c</span>(<span class="st">&quot;gauche&quot;</span>, <span class="st">&quot;og&quot;</span>)))</span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt; [1] &quot;r&quot; &quot;r&quot; &quot;l&quot; &quot;l&quot;</span></span>
 <span id="cb3-26"><a href="#cb3-26"></a></span>
-<span id="cb3-27"><a href="#cb3-27"></a><span class="co">## Or if you have weird codes for eyes</span></span>
-<span id="cb3-28"><a href="#cb3-28"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;alright&quot;</span>, <span class="st">&quot;righton&quot;</span>, <span class="st">&quot;lefty&quot;</span>,<span class="st">&quot;leftover&quot;</span>)</span>
-<span id="cb3-29"><a href="#cb3-29"></a></span>
-<span id="cb3-30"><a href="#cb3-30"></a><span class="kw">recodeye</span>(x, <span class="dt">eyecodes =</span> <span class="kw">list</span>(<span class="dt">r =</span> <span class="kw">c</span>(<span class="st">&quot;alright&quot;</span>,<span class="st">&quot;righton&quot;</span>), <span class="dt">l =</span> <span class="kw">c</span>(<span class="st">&quot;lefty&quot;</span>,<span class="st">&quot;leftover&quot;</span>)))</span>
-<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt; [1] &quot;r&quot; &quot;r&quot; &quot;l&quot; &quot;l&quot;</span></span></code></pre></div>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co">## or change it more globally with `set_eye_strings`</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="kw">set_eye_strings</span>(<span class="dt">right =</span> <span class="kw">c</span>(<span class="st">&quot;droit&quot;</span>, <span class="st">&quot;od&quot;</span>), <span class="dt">left =</span> <span class="kw">c</span>(<span class="st">&quot;gauche&quot;</span>, <span class="st">&quot;og&quot;</span>))</span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="kw">recodeye</span>(french)</span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt; [1] &quot;r&quot; &quot;r&quot; &quot;l&quot; &quot;l&quot;</span></span>
+<span id="cb3-31"><a href="#cb3-31"></a></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="co"># to restore the default, call set_eye_strings empty</span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="kw">set_eye_strings</span>()</span></code></pre></div>
 </div>
 <div id="eyes" class="section level2">
 <h2>Counting patients and eyes</h2>
-<p><code>eyes</code> offers a very simple tool for counting patients and eyes.</p>
+<p><code>eyes</code> offers a very simple tool for counting patients and eyes. It will return a list object which gives you easy access to the data.</p>
 <p>An important step in <code>eyes</code> is the guessing of the columns that identify patients and eyes. As for <code>myop</code> and of course <code>blink</code>, a specific column naming is required for a reliable automatic detection of patient and eye column(s) ( <a href="#names-and-codes">see Names and codes</a>)</p>
 <p>The arguments <strong>id</strong> and <strong>eye</strong> arguments overrule the name guessing for the respective columns.</p>
 <div id="guessing" class="section level3">
@@ -540,7 +543,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h4>patient ID columns:</h4>
 <ul>
 <li>names can be in any case.</li>
-<li>First, <code>eyes</code> is looking for names that contain both strings “pat” and “id” (the order doesn’t matter)</li>
+<li>First, <code>eyes</code> is looking for names that contain both strings “pat” and “id” (the order doesn’t matter) you can change those codes with <code>set_eye_strings()</code></li>
 <li>Next, it will look for columns that are plainly called “ID”</li>
 <li>Last, it will search for all names that contain either “pat” or “id”</li>
 </ul>
@@ -549,7 +552,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h4>eye variable column:</h4>
 <ul>
 <li>names can be in any case.</li>
-<li><code>eyes</code> looks for columns that contain the string either “eye” or “eyes”</li>
+<li><code>eyes</code> looks for columns that contain the string either “eye” or “eyes” - you can change those codes with <code>set_eye_strings()</code></li>
 <li>columns will full string “eye” or “eyes” will be given precedence</li>
 </ul>
 </div>
@@ -565,6 +568,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>left eyes: c(“l”, “le”, “os”, “left”)</li>
 <li>both eyes: c(“b”, “both”, “ou”)</li>
 </ul></li>
+<li><p>you can change those codes with <code>set_eye_strings()</code></p></li>
 </ul>
 </div>
 <div id="report" class="section level3">
@@ -574,50 +578,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><strong>english</strong> Which numbers to be written in plain english: choose “small” for numbers till 12, “all” (all numbers), or “none” (or any other string!) for none</li>
 <li><strong>caps</strong> First number will have capital letter</li>
 </ul>
-<p><strong>eyestr</strong> is a shorthand for <code>eyes(x, report = TRUE)</code>. The name was chosen because it’s a contraction of “eyes” and “strings” and it’s a tiny bit easier to type than “eyetxt”.</p>
+<p><strong>eyestr</strong> will create a string which you can paste into a report. The name was chosen because it’s a contraction of “eyes” and “strings” and it’s a tiny bit easier to type than “eyetxt”.</p>
 <div id="use-in-rmarkdown" class="section level4">
 <h4>Use in rmarkdown</h4>
-<p><code>eyestr</code> was designed with the use in rmarkdown in mind, most explicitly for the use inline:</p>
-<blockquote>
-<p>We analysed <code>`r eyestr(amd)`</code></p>
-</blockquote>
-<p><em>will give:</em></p>
-<blockquote>
-<p>We analysed 7802 patients.</p>
-</blockquote>
-<p>The beauty of this report is of course that the numbers will always update with new data.</p>
+<p><code>eyestr</code> was designed with the use in rmarkdown in mind, most explicitly for the use inline. You can change the way numbers are converted to english with the <code>english</code> argument. By default, numbers smaller than or equal to 12 will be real English, all other numbers will be … numbers. You can capitalise the first number with the <code>caps</code> argument.</p>
+<p>We analyzed <code>`r eyestr(amd2)`</code> gives: We analyzed 3357 eyes of 3357 patients We analyzed <code>`r eyestr(head(amd2, 100))`</code>gives: We analyzed eleven eyes of eleven patients We analyzed <code>`r eyestr(amd2, english = &quot;all&quot;)`</code> gives: We analyzed three thousand three hundred and fifty-seven eyes of three thousand three hundred and fifty-seven patients <code>`r eyestr(head(amd2, 100), caps = TRUE)`</code> were analyzed gives: Eleven eyes of eleven patients were analyzed We analyzed <code>`r eyestr(head(amd2, 100), english = &quot;none&quot;)`</code> gives: We analyzed 11 eyes of 11 patients</p>
 </div>
-</div>
-<div id="examples-1" class="section level3">
-<h3>Examples</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">eyes</span>(amd2)</span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; patients     eyes    right     left </span></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt;     3357     3357     1681     1676</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="kw">library</span>(eyedata)</span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">eyes</span>(amd2)</span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; patients     eyes    right     left </span></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt;     3357     3357     1681     1676</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># Same as `eyes`, but as text for reports</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="kw">eyestr</span>(amd2)</span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; [1] &quot;3357 eyes of 3357 patients&quot;</span></span>
-<span id="cb4-13"><a href="#cb4-13"></a></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="co">## Numbers smaller than or equal to 12 will be real English</span></span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="kw">eyestr</span>(<span class="kw">head</span>(amd2, <span class="dv">100</span>))</span>
-<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; [1] &quot;eleven eyes of eleven patients&quot;</span></span>
-<span id="cb4-17"><a href="#cb4-17"></a></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="co">## Or, you can make all numbers english:</span></span>
-<span id="cb4-19"><a href="#cb4-19"></a><span class="kw">eyestr</span>(amd2, <span class="dt">english =</span> <span class="st">&quot;all&quot;</span>)</span>
-<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; [1] &quot;three thousand three hundred and fifty-seven eyes of three thousand three hundred and fifty-seven patients&quot;</span></span>
-<span id="cb4-21"><a href="#cb4-21"></a></span>
-<span id="cb4-22"><a href="#cb4-22"></a><span class="co">## make first number capital letter</span></span>
-<span id="cb4-23"><a href="#cb4-23"></a><span class="kw">eyestr</span>(<span class="kw">head</span>(amd2, <span class="dv">100</span>), <span class="dt">caps =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; [1] &quot;Eleven eyes of eleven patients&quot;</span></span>
-<span id="cb4-25"><a href="#cb4-25"></a></span>
-<span id="cb4-26"><a href="#cb4-26"></a><span class="co">## you can have all numbers printed as numbers</span></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="kw">eyestr</span>(<span class="kw">head</span>(amd2, <span class="dv">100</span>), <span class="dt">english =</span> <span class="st">&quot;none&quot;</span>)</span>
-<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; [1] &quot;11 eyes of 11 patients&quot;</span></span></code></pre></div>
 </div>
 </div>
 <div id="reshape-eye-data" class="section level2">
@@ -668,57 +634,57 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>The <code>variable</code> and <code>value</code> columns will be pivoted wide again with <code>tidyr::pivot_wider</code>.</li>
 </ul></li>
 </ol>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>wide1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">id =</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>],  <span class="dt">r =</span> <span class="dv">11</span><span class="op">:</span><span class="dv">13</span> , <span class="dt">l =</span> <span class="dv">14</span><span class="op">:</span><span class="dv">16</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>iop_wide &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">id =</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">iop_r =</span> <span class="dv">11</span><span class="op">:</span><span class="dv">13</span>, <span class="dt">iop_l =</span> <span class="dv">14</span><span class="op">:</span><span class="dv">16</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">## Mildly messy data frame with several variables spread over two columns:</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>wide_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="dt">id =</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>], </span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="dt">surgery_right =</span> <span class="kw">c</span>(<span class="st">&quot;TE&quot;</span>, <span class="st">&quot;TE&quot;</span>, <span class="st">&quot;SLT&quot;</span>, <span class="st">&quot;SLT&quot;</span>),</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="dt">surgery_left =</span> <span class="kw">c</span>(<span class="st">&quot;TE&quot;</span>, <span class="st">&quot;TE&quot;</span>, <span class="st">&quot;TE&quot;</span>, <span class="st">&quot;SLT&quot;</span>),</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="dt">iop_r_preop =</span> <span class="dv">21</span><span class="op">:</span><span class="dv">24</span>, <span class="dt">iop_r_postop =</span> <span class="dv">11</span><span class="op">:</span><span class="dv">14</span>,</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="dt">iop_l_preop =</span> <span class="dv">31</span><span class="op">:</span><span class="dv">34</span>, <span class="dt">iop_l_postop =</span> <span class="dv">11</span><span class="op">:</span><span class="dv">14</span>, </span>
+<span id="cb4-10"><a href="#cb4-10"></a>  <span class="dt">va_r_preop =</span> <span class="dv">41</span><span class="op">:</span><span class="dv">44</span>, <span class="dt">va_r_postop =</span> <span class="dv">45</span><span class="op">:</span><span class="dv">48</span>,</span>
+<span id="cb4-11"><a href="#cb4-11"></a>  <span class="dt">va_l_preop =</span> <span class="dv">41</span><span class="op">:</span><span class="dv">44</span>, <span class="dt">va_l_postop =</span> <span class="dv">45</span><span class="op">:</span><span class="dv">48</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>)</span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co">## the variable has not been exactly named, (but it is probably IOP data), </span></span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">## you can specify the dimension with the var argument</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a>wide1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">id =</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>],  <span class="dt">r =</span> <span class="dv">11</span><span class="op">:</span><span class="dv">13</span> , <span class="dt">l =</span> <span class="dv">14</span><span class="op">:</span><span class="dv">16</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
 <span id="cb5-4"><a href="#cb5-4"></a><span class="kw">myop</span>(wide1, <span class="dt">var =</span> <span class="st">&quot;iop&quot;</span>)</span>
 <span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; # A tibble: 6 x 3</span></span>
 <span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt;   id    eye   iop  </span></span>
 <span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; 1 a     r     11   </span></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; 2 a     l     14   </span></span>
-<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; 3 b     r     12   </span></span>
-<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; 4 b     l     15   </span></span>
-<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; 5 c     r     13   </span></span>
-<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; 6 c     l     16</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; 1 a     right 11   </span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; 2 a     left  14   </span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; 3 b     right 12   </span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; 4 b     left  15   </span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; 5 c     right 13   </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; 6 c     left  16</span></span>
 <span id="cb5-14"><a href="#cb5-14"></a></span>
 <span id="cb5-15"><a href="#cb5-15"></a><span class="co">## If the dimension is already part of the column names, this is not necessary. </span></span>
-<span id="cb5-16"><a href="#cb5-16"></a>iop_wide &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">id =</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">iop_r =</span> <span class="dv">11</span><span class="op">:</span><span class="dv">13</span>, <span class="dt">iop_l =</span> <span class="dv">14</span><span class="op">:</span><span class="dv">16</span>)</span>
-<span id="cb5-17"><a href="#cb5-17"></a><span class="kw">myop</span>(iop_wide)</span>
-<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; # A tibble: 6 x 3</span></span>
-<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt;   id    eye   iop  </span></span>
-<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span></span>
-<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; 1 a     r     11   </span></span>
-<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; 2 a     l     14   </span></span>
-<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; 3 b     r     12   </span></span>
-<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; 4 b     l     15   </span></span>
-<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; 5 c     r     13   </span></span>
-<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; 6 c     l     16</span></span>
-<span id="cb5-27"><a href="#cb5-27"></a></span>
-<span id="cb5-28"><a href="#cb5-28"></a><span class="co">## Mildly messy data frame with several variables spread over two columns:</span></span>
-<span id="cb5-29"><a href="#cb5-29"></a>wide_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(</span>
-<span id="cb5-30"><a href="#cb5-30"></a>  <span class="dt">id =</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>], </span>
-<span id="cb5-31"><a href="#cb5-31"></a>  <span class="dt">surgery_right =</span> <span class="kw">c</span>(<span class="st">&quot;TE&quot;</span>, <span class="st">&quot;TE&quot;</span>, <span class="st">&quot;SLT&quot;</span>, <span class="st">&quot;SLT&quot;</span>),</span>
-<span id="cb5-32"><a href="#cb5-32"></a>  <span class="dt">surgery_left =</span> <span class="kw">c</span>(<span class="st">&quot;TE&quot;</span>, <span class="st">&quot;TE&quot;</span>, <span class="st">&quot;TE&quot;</span>, <span class="st">&quot;SLT&quot;</span>),</span>
-<span id="cb5-33"><a href="#cb5-33"></a>  <span class="dt">iop_r_preop =</span> <span class="dv">21</span><span class="op">:</span><span class="dv">24</span>, <span class="dt">iop_r_postop =</span> <span class="dv">11</span><span class="op">:</span><span class="dv">14</span>,</span>
-<span id="cb5-34"><a href="#cb5-34"></a>  <span class="dt">iop_l_preop =</span> <span class="dv">31</span><span class="op">:</span><span class="dv">34</span>, <span class="dt">iop_l_postop =</span> <span class="dv">11</span><span class="op">:</span><span class="dv">14</span>, </span>
-<span id="cb5-35"><a href="#cb5-35"></a>  <span class="dt">va_r_preop =</span> <span class="dv">41</span><span class="op">:</span><span class="dv">44</span>, <span class="dt">va_r_postop =</span> <span class="dv">45</span><span class="op">:</span><span class="dv">48</span>,</span>
-<span id="cb5-36"><a href="#cb5-36"></a>  <span class="dt">va_l_preop =</span> <span class="dv">41</span><span class="op">:</span><span class="dv">44</span>, <span class="dt">va_l_postop =</span> <span class="dv">45</span><span class="op">:</span><span class="dv">48</span></span>
-<span id="cb5-37"><a href="#cb5-37"></a>)</span>
-<span id="cb5-38"><a href="#cb5-38"></a></span>
-<span id="cb5-39"><a href="#cb5-39"></a><span class="co">## myop deals with this in a breeze:</span></span>
-<span id="cb5-40"><a href="#cb5-40"></a><span class="kw">myop</span>(wide_df)</span>
-<span id="cb5-41"><a href="#cb5-41"></a><span class="co">#&gt; # A tibble: 8 x 7</span></span>
-<span id="cb5-42"><a href="#cb5-42"></a><span class="co">#&gt;   id    eye   surgery iop_preop iop_postop va_preop va_postop</span></span>
-<span id="cb5-43"><a href="#cb5-43"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;    </span></span>
-<span id="cb5-44"><a href="#cb5-44"></a><span class="co">#&gt; 1 a     r     TE      21        11         41       45       </span></span>
-<span id="cb5-45"><a href="#cb5-45"></a><span class="co">#&gt; 2 a     l     TE      31        11         41       45       </span></span>
-<span id="cb5-46"><a href="#cb5-46"></a><span class="co">#&gt; 3 b     r     TE      22        12         42       46       </span></span>
-<span id="cb5-47"><a href="#cb5-47"></a><span class="co">#&gt; 4 b     l     TE      32        12         42       46       </span></span>
-<span id="cb5-48"><a href="#cb5-48"></a><span class="co">#&gt; 5 c     r     SLT     23        13         43       47       </span></span>
-<span id="cb5-49"><a href="#cb5-49"></a><span class="co">#&gt; 6 c     l     TE      33        13         43       47       </span></span>
-<span id="cb5-50"><a href="#cb5-50"></a><span class="co">#&gt; 7 d     r     SLT     24        14         44       48       </span></span>
-<span id="cb5-51"><a href="#cb5-51"></a><span class="co">#&gt; 8 d     l     SLT     34        14         44       48</span></span></code></pre></div>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="kw">myop</span>(iop_wide)</span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; # A tibble: 6 x 3</span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt;   id    eye   iop  </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; 1 a     right 11   </span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; 2 a     left  14   </span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; 3 b     right 12   </span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; 4 b     left  15   </span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; 5 c     right 13   </span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; 6 c     left  16</span></span>
+<span id="cb5-26"><a href="#cb5-26"></a></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">## myop deals with this in a breeze:</span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="kw">myop</span>(wide_df)</span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt; # A tibble: 8 x 7</span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt;   id    eye   surgery iop_preop iop_postop va_preop va_postop</span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt;    &lt;chr&gt;    </span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt; 1 a     right TE      21        11         41       45       </span></span>
+<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt; 2 a     left  TE      31        11         41       45       </span></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt; 3 b     right TE      22        12         42       46       </span></span>
+<span id="cb5-35"><a href="#cb5-35"></a><span class="co">#&gt; 4 b     left  TE      32        12         42       46       </span></span>
+<span id="cb5-36"><a href="#cb5-36"></a><span class="co">#&gt; 5 c     right SLT     23        13         43       47       </span></span>
+<span id="cb5-37"><a href="#cb5-37"></a><span class="co">#&gt; 6 c     left  TE      33        13         43       47       </span></span>
+<span id="cb5-38"><a href="#cb5-38"></a><span class="co">#&gt; 7 d     right SLT     24        14         44       48       </span></span>
+<span id="cb5-39"><a href="#cb5-39"></a><span class="co">#&gt; 8 d     left  SLT     34        14         44       48</span></span></code></pre></div>
 </div>
 </div>
 <div id="hyperop" class="section level3">
@@ -766,7 +732,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>As you can imagine, a lot of those steps rely hugely on reasonable naming of your columns and this is what makes this function unfortunately a bit fragile. However, if you adhere to the naming conventions, blink (and myop) will do a great job for you.</p>
 <p>If you are not happy with the automatic column selection, you can manually select the VA and IOP columns with the arguments <code>va_cols</code> or <code>iop_cols</code>. Both accept <a href="https://tidyselect.r-lib.org/reference/language.html">tidyselection</a>. I personally find <code>starts_with</code>, <code>ends_with</code>, <code>contains()</code> or the more general <code>matches()</code> very useful.</p>
 </div>
-<div id="examples-2" class="section level3">
+<div id="examples-1" class="section level3">
 <h3>Examples</h3>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">blink</span>(wide_df)</span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt; The lifecycle of blink() has expired. It will no longer be</span></span>
@@ -779,91 +745,93 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; # A tibble: 8 x 7</span></span>
 <span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;   id    eye   surgery iop_preop iop_postop va_preop va_postop</span></span>
 <span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;      &lt;logmar&gt; &lt;logmar&gt; </span></span>
-<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; 1 a     r     TE      21        11         0.88     0.80     </span></span>
-<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt; 2 a     l     TE      31        11         0.88     0.80     </span></span>
-<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt; 3 b     r     TE      22        12         0.86     0.78     </span></span>
-<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt; 4 b     l     TE      32        12         0.86     0.78     </span></span>
-<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt; 5 c     r     SLT     23        13         0.84     0.76     </span></span>
-<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt; 6 c     l     TE      33        13         0.84     0.76     </span></span>
-<span id="cb7-18"><a href="#cb7-18"></a><span class="co">#&gt; 7 d     r     SLT     24        14         0.82     0.74     </span></span>
-<span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt; 8 d     l     SLT     34        14         0.82     0.74     </span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; 1 a     right TE      21        11         0.88     0.80     </span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt; 2 a     left  TE      31        11         0.88     0.80     </span></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt; 3 b     right TE      22        12         0.86     0.78     </span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt; 4 b     left  TE      32        12         0.86     0.78     </span></span>
+<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt; 5 c     right SLT     23        13         0.84     0.76     </span></span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt; 6 c     left  TE      33        13         0.84     0.76     </span></span>
+<span id="cb7-18"><a href="#cb7-18"></a><span class="co">#&gt; 7 d     right SLT     24        14         0.82     0.74     </span></span>
+<span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt; 8 d     left  SLT     34        14         0.82     0.74     </span></span>
 <span id="cb7-20"><a href="#cb7-20"></a><span class="co">#&gt; </span></span>
 <span id="cb7-21"><a href="#cb7-21"></a><span class="co">#&gt; ══ Count of patient and eyes ═══════════</span></span>
-<span id="cb7-22"><a href="#cb7-22"></a><span class="co">#&gt; patients     eyes    right     left </span></span>
-<span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt;        4        8        4        4 </span></span>
-<span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt; </span></span>
-<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt; ══ Visual acuity ═══════════════════════</span></span>
-<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt; </span></span>
-<span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt; ── $VA_total (all eyes)</span></span>
-<span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt;         var mean sd n min max</span></span>
-<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt; 1  va_preop  0.8  0 8 0.8 0.9</span></span>
-<span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt; 2 va_postop  0.8  0 8 0.7 0.8</span></span>
-<span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt; </span></span>
-<span id="cb7-32"><a href="#cb7-32"></a><span class="co">#&gt; ── $VA_eyes (right and left eyes)</span></span>
-<span id="cb7-33"><a href="#cb7-33"></a><span class="co">#&gt;   eye       var mean sd n min max</span></span>
-<span id="cb7-34"><a href="#cb7-34"></a><span class="co">#&gt; 1   l  va_preop  0.8  0 4 0.8 0.9</span></span>
-<span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt; 2   l va_postop  0.8  0 4 0.7 0.8</span></span>
-<span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt; 3   r  va_preop  0.8  0 4 0.8 0.9</span></span>
-<span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt; 4   r va_postop  0.8  0 4 0.7 0.8</span></span>
-<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt; </span></span>
-<span id="cb7-39"><a href="#cb7-39"></a><span class="co">#&gt; ══ Intraocular pressure ════════════════</span></span>
-<span id="cb7-40"><a href="#cb7-40"></a><span class="co">#&gt; </span></span>
-<span id="cb7-41"><a href="#cb7-41"></a><span class="co">#&gt; ── $IOP_total (all eyes)</span></span>
-<span id="cb7-42"><a href="#cb7-42"></a><span class="co">#&gt;          var mean  sd n min max</span></span>
-<span id="cb7-43"><a href="#cb7-43"></a><span class="co">#&gt; 1  iop_preop 27.5 5.5 8  21  34</span></span>
-<span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt; 2 iop_postop 12.5 1.2 8  11  14</span></span>
-<span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt; </span></span>
-<span id="cb7-46"><a href="#cb7-46"></a><span class="co">#&gt; ── $IOP_eyes (right and left eyes)</span></span>
-<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt;   eye        var mean  sd n min max</span></span>
-<span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt; 1   l  iop_preop 32.5 1.3 4  31  34</span></span>
-<span id="cb7-49"><a href="#cb7-49"></a><span class="co">#&gt; 2   l iop_postop 12.5 1.3 4  11  14</span></span>
-<span id="cb7-50"><a href="#cb7-50"></a><span class="co">#&gt; 3   r  iop_preop 22.5 1.3 4  21  24</span></span>
-<span id="cb7-51"><a href="#cb7-51"></a><span class="co">#&gt; 4   r iop_postop 12.5 1.3 4  11  14</span></span>
-<span id="cb7-52"><a href="#cb7-52"></a></span>
-<span id="cb7-53"><a href="#cb7-53"></a><span class="kw">blink</span>(amd)</span>
-<span id="cb7-54"><a href="#cb7-54"></a><span class="co">#&gt; The lifecycle of blink() has expired. It will no longer be</span></span>
-<span id="cb7-55"><a href="#cb7-55"></a><span class="co">#&gt;   maintained, but will be kept in the package.</span></span>
-<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt; Warning: Data seems already myopic - no changes made. ?myop for help</span></span>
-<span id="cb7-57"><a href="#cb7-57"></a><span class="co">#&gt; From etdrs. Could be etdrs, logmar, snellendec</span></span>
-<span id="cb7-58"><a href="#cb7-58"></a><span class="co">#&gt; No eye column found: Counting patients only</span></span>
-<span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt; </span></span>
-<span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt; ── blink ───────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt; ══ Data ════════════════════════════════</span></span>
-<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt; # A tibble: 118,255 x 11</span></span>
-<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt;    patid sex   age   avdays_induc ethnicity loaded  time injgiven va     regimen</span></span>
-<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;fct&gt;        &lt;dbl&gt; &lt;chr&gt;     &lt;lgl&gt;  &lt;int&gt; &lt;lgl&gt;    &lt;logm&gt; &lt;chr&gt;  </span></span>
-<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;  1 id_1  m     60-69           28 se_asian  TRUE       0 TRUE     0.30   ranibi…</span></span>
-<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt;  2 id_1  m     60-69           28 se_asian  TRUE      28 TRUE     0.30   ranibi…</span></span>
-<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt;  3 id_1  m     60-69           28 se_asian  TRUE      56 TRUE     0.30   ranibi…</span></span>
-<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt;  4 id_1  m     60-69           28 se_asian  TRUE      91 TRUE     0.40   ranibi…</span></span>
-<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt;  5 id_1  m     60-69           28 se_asian  TRUE     131 TRUE     0.46   ranibi…</span></span>
-<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt;  6 id_1  m     60-69           28 se_asian  TRUE     173 TRUE     0.40   ranibi…</span></span>
-<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt;  7 id_1  m     60-69           28 se_asian  TRUE     236 TRUE     0.50   ranibi…</span></span>
-<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt;  8 id_1  m     60-69           28 se_asian  TRUE     278 TRUE     0.50   ranibi…</span></span>
-<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt;  9 id_1  m     60-69           28 se_asian  TRUE     411 TRUE     0.60   ranibi…</span></span>
-<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt; 10 id_1  m     60-69           28 se_asian  TRUE     453 TRUE     0.54   ranibi…</span></span>
-<span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt; # … with 118,245 more rows, and 1 more variable: pre2013 &lt;lgl&gt;</span></span>
-<span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt; </span></span>
-<span id="cb7-77"><a href="#cb7-77"></a><span class="co">#&gt; ══ Count of patient and eyes ═══════════</span></span>
-<span id="cb7-78"><a href="#cb7-78"></a><span class="co">#&gt; patients </span></span>
-<span id="cb7-79"><a href="#cb7-79"></a><span class="co">#&gt;     7802 </span></span>
-<span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt; </span></span>
-<span id="cb7-81"><a href="#cb7-81"></a><span class="co">#&gt; ══ Visual acuity ═══════════════════════</span></span>
+<span id="cb7-22"><a href="#cb7-22"></a><span class="co">#&gt; ══ Counts ═══════════════</span></span>
+<span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt;    id  eyes right  left </span></span>
+<span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt;     4     8     4     4 </span></span>
+<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt; </span></span>
+<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt; ══ Visual acuity ═══════════════════════</span></span>
+<span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt; </span></span>
+<span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt; ── $VA_total (all eyes)</span></span>
+<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt;         var mean sd n min max</span></span>
+<span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt; 1  va_preop  0.8  0 8 0.8 0.9</span></span>
+<span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt; 2 va_postop  0.8  0 8 0.7 0.8</span></span>
+<span id="cb7-32"><a href="#cb7-32"></a><span class="co">#&gt; </span></span>
+<span id="cb7-33"><a href="#cb7-33"></a><span class="co">#&gt; ── $VA_eyes (right and left eyes)</span></span>
+<span id="cb7-34"><a href="#cb7-34"></a><span class="co">#&gt;     eye       var mean sd n min max</span></span>
+<span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt; 1  left  va_preop  0.8  0 4 0.8 0.9</span></span>
+<span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt; 2  left va_postop  0.8  0 4 0.7 0.8</span></span>
+<span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt; 3 right  va_preop  0.8  0 4 0.8 0.9</span></span>
+<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt; 4 right va_postop  0.8  0 4 0.7 0.8</span></span>
+<span id="cb7-39"><a href="#cb7-39"></a><span class="co">#&gt; </span></span>
+<span id="cb7-40"><a href="#cb7-40"></a><span class="co">#&gt; ══ Intraocular pressure ════════════════</span></span>
+<span id="cb7-41"><a href="#cb7-41"></a><span class="co">#&gt; </span></span>
+<span id="cb7-42"><a href="#cb7-42"></a><span class="co">#&gt; ── $IOP_total (all eyes)</span></span>
+<span id="cb7-43"><a href="#cb7-43"></a><span class="co">#&gt;          var mean  sd n min max</span></span>
+<span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt; 1  iop_preop 27.5 5.5 8  21  34</span></span>
+<span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt; 2 iop_postop 12.5 1.2 8  11  14</span></span>
+<span id="cb7-46"><a href="#cb7-46"></a><span class="co">#&gt; </span></span>
+<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt; ── $IOP_eyes (right and left eyes)</span></span>
+<span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt;     eye        var mean  sd n min max</span></span>
+<span id="cb7-49"><a href="#cb7-49"></a><span class="co">#&gt; 1  left  iop_preop 32.5 1.3 4  31  34</span></span>
+<span id="cb7-50"><a href="#cb7-50"></a><span class="co">#&gt; 2  left iop_postop 12.5 1.3 4  11  14</span></span>
+<span id="cb7-51"><a href="#cb7-51"></a><span class="co">#&gt; 3 right  iop_preop 22.5 1.3 4  21  24</span></span>
+<span id="cb7-52"><a href="#cb7-52"></a><span class="co">#&gt; 4 right iop_postop 12.5 1.3 4  11  14</span></span>
+<span id="cb7-53"><a href="#cb7-53"></a></span>
+<span id="cb7-54"><a href="#cb7-54"></a><span class="kw">blink</span>(amd)</span>
+<span id="cb7-55"><a href="#cb7-55"></a><span class="co">#&gt; The lifecycle of blink() has expired. It will no longer be</span></span>
+<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt;   maintained, but will be kept in the package.</span></span>
+<span id="cb7-57"><a href="#cb7-57"></a><span class="co">#&gt; Warning: Data seems already myopic - no changes made. ?myop for help</span></span>
+<span id="cb7-58"><a href="#cb7-58"></a><span class="co">#&gt; From etdrs. Could be etdrs, logmar, snellendec</span></span>
+<span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt; Unclear which is the eye column. Counting id only.</span></span>
+<span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt; Specify eye column with &quot;eye_col&quot; argument</span></span>
+<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt; </span></span>
+<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt; ── blink ───────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt; ══ Data ════════════════════════════════</span></span>
+<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt; # A tibble: 118,255 x 11</span></span>
+<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;    patid sex   age   avdays_induc ethnicity loaded  time injgiven va     regimen</span></span>
+<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;fct&gt;        &lt;dbl&gt; &lt;chr&gt;     &lt;lgl&gt;  &lt;int&gt; &lt;lgl&gt;    &lt;logm&gt; &lt;chr&gt;  </span></span>
+<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt;  1 id_1  m     60-69           28 se_asian  TRUE       0 TRUE     0.30   ranibi…</span></span>
+<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt;  2 id_1  m     60-69           28 se_asian  TRUE      28 TRUE     0.30   ranibi…</span></span>
+<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt;  3 id_1  m     60-69           28 se_asian  TRUE      56 TRUE     0.30   ranibi…</span></span>
+<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt;  4 id_1  m     60-69           28 se_asian  TRUE      91 TRUE     0.40   ranibi…</span></span>
+<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt;  5 id_1  m     60-69           28 se_asian  TRUE     131 TRUE     0.46   ranibi…</span></span>
+<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt;  6 id_1  m     60-69           28 se_asian  TRUE     173 TRUE     0.40   ranibi…</span></span>
+<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt;  7 id_1  m     60-69           28 se_asian  TRUE     236 TRUE     0.50   ranibi…</span></span>
+<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt;  8 id_1  m     60-69           28 se_asian  TRUE     278 TRUE     0.50   ranibi…</span></span>
+<span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt;  9 id_1  m     60-69           28 se_asian  TRUE     411 TRUE     0.60   ranibi…</span></span>
+<span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt; 10 id_1  m     60-69           28 se_asian  TRUE     453 TRUE     0.54   ranibi…</span></span>
+<span id="cb7-77"><a href="#cb7-77"></a><span class="co">#&gt; # … with 118,245 more rows, and 1 more variable: pre2013 &lt;lgl&gt;</span></span>
+<span id="cb7-78"><a href="#cb7-78"></a><span class="co">#&gt; </span></span>
+<span id="cb7-79"><a href="#cb7-79"></a><span class="co">#&gt; ══ Count of patient and eyes ═══════════</span></span>
+<span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt;   id </span></span>
+<span id="cb7-81"><a href="#cb7-81"></a><span class="co">#&gt; 7802 </span></span>
 <span id="cb7-82"><a href="#cb7-82"></a><span class="co">#&gt; </span></span>
-<span id="cb7-83"><a href="#cb7-83"></a><span class="co">#&gt; ── $VA_total (all eyes)</span></span>
-<span id="cb7-84"><a href="#cb7-84"></a><span class="co">#&gt;   var mean  sd      n  min max</span></span>
-<span id="cb7-85"><a href="#cb7-85"></a><span class="co">#&gt; 1  va  0.5 0.4 116530 -0.3 2.3</span></span>
-<span id="cb7-86"><a href="#cb7-86"></a><span class="co">#&gt; </span></span>
-<span id="cb7-87"><a href="#cb7-87"></a><span class="co">#&gt; ── $VA_eyes (right and left eyes)</span></span>
-<span id="cb7-88"><a href="#cb7-88"></a><span class="co">#&gt; NULL</span></span>
-<span id="cb7-89"><a href="#cb7-89"></a><span class="co">#&gt; </span></span>
-<span id="cb7-90"><a href="#cb7-90"></a><span class="co">#&gt; ══ Intraocular pressure ════════════════</span></span>
+<span id="cb7-83"><a href="#cb7-83"></a><span class="co">#&gt; ══ Visual acuity ═══════════════════════</span></span>
+<span id="cb7-84"><a href="#cb7-84"></a><span class="co">#&gt; </span></span>
+<span id="cb7-85"><a href="#cb7-85"></a><span class="co">#&gt; ── $VA_total (all eyes)</span></span>
+<span id="cb7-86"><a href="#cb7-86"></a><span class="co">#&gt;   var mean  sd      n  min max</span></span>
+<span id="cb7-87"><a href="#cb7-87"></a><span class="co">#&gt; 1  va  0.5 0.4 116530 -0.3 2.3</span></span>
+<span id="cb7-88"><a href="#cb7-88"></a><span class="co">#&gt; </span></span>
+<span id="cb7-89"><a href="#cb7-89"></a><span class="co">#&gt; ── $VA_eyes (right and left eyes)</span></span>
+<span id="cb7-90"><a href="#cb7-90"></a><span class="co">#&gt; NULL</span></span>
 <span id="cb7-91"><a href="#cb7-91"></a><span class="co">#&gt; </span></span>
-<span id="cb7-92"><a href="#cb7-92"></a><span class="co">#&gt; ── $IOP_total (all eyes)</span></span>
-<span id="cb7-93"><a href="#cb7-93"></a><span class="co">#&gt; NULL</span></span>
-<span id="cb7-94"><a href="#cb7-94"></a><span class="co">#&gt; </span></span>
-<span id="cb7-95"><a href="#cb7-95"></a><span class="co">#&gt; ── $IOP_eyes (right and left eyes)</span></span>
-<span id="cb7-96"><a href="#cb7-96"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
+<span id="cb7-92"><a href="#cb7-92"></a><span class="co">#&gt; ══ Intraocular pressure ════════════════</span></span>
+<span id="cb7-93"><a href="#cb7-93"></a><span class="co">#&gt; </span></span>
+<span id="cb7-94"><a href="#cb7-94"></a><span class="co">#&gt; ── $IOP_total (all eyes)</span></span>
+<span id="cb7-95"><a href="#cb7-95"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb7-96"><a href="#cb7-96"></a><span class="co">#&gt; </span></span>
+<span id="cb7-97"><a href="#cb7-97"></a><span class="co">#&gt; ── $IOP_eyes (right and left eyes)</span></span>
+<span id="cb7-98"><a href="#cb7-98"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
 </div>
 </div>
 <div id="names-and-codes" class="section level2">
@@ -969,7 +937,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>It is not really intended to replace other awesome data exploration packages / functions such as <code>skimr::skim</code>, and it will likely remain focussed on summarizing numerical data only.</p>
 <p>It uses an S3 generic under the hood with methods for atomic vectors, data frames, and lists of either atomic vectors or data frames. Character vectors will be omitted (and it should give a warning that it has done so).</p>
 <p><code>reveal()</code> takes the grouping argument <code>by</code> and it returns vector for atomic vectors or a data frame for lists.</p>
-<div id="examples-3" class="section level3">
+<div id="examples-2" class="section level3">
 <h3>Examples</h3>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>clean_df &lt;-<span class="st"> </span><span class="kw">myop</span>(wide_df)</span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="kw">reveal</span>(clean_df)</span>
@@ -980,40 +948,40 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt; 4  va_postop 46.5 1.2 8  45  48</span></span>
 <span id="cb14-8"><a href="#cb14-8"></a></span>
 <span id="cb14-9"><a href="#cb14-9"></a><span class="kw">reveal</span>(clean_df, <span class="dt">by =</span> <span class="st">&quot;eye&quot;</span>)</span>
-<span id="cb14-10"><a href="#cb14-10"></a><span class="co">#&gt;   eye        var mean  sd n min max</span></span>
-<span id="cb14-11"><a href="#cb14-11"></a><span class="co">#&gt; 1   l  iop_preop 32.5 1.3 4  31  34</span></span>
-<span id="cb14-12"><a href="#cb14-12"></a><span class="co">#&gt; 2   l iop_postop 12.5 1.3 4  11  14</span></span>
-<span id="cb14-13"><a href="#cb14-13"></a><span class="co">#&gt; 3   l   va_preop 42.5 1.3 4  41  44</span></span>
-<span id="cb14-14"><a href="#cb14-14"></a><span class="co">#&gt; 4   l  va_postop 46.5 1.3 4  45  48</span></span>
-<span id="cb14-15"><a href="#cb14-15"></a><span class="co">#&gt; 5   r  iop_preop 22.5 1.3 4  21  24</span></span>
-<span id="cb14-16"><a href="#cb14-16"></a><span class="co">#&gt; 6   r iop_postop 12.5 1.3 4  11  14</span></span>
-<span id="cb14-17"><a href="#cb14-17"></a><span class="co">#&gt; 7   r   va_preop 42.5 1.3 4  41  44</span></span>
-<span id="cb14-18"><a href="#cb14-18"></a><span class="co">#&gt; 8   r  va_postop 46.5 1.3 4  45  48</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a><span class="co">#&gt;     eye        var mean  sd n min max</span></span>
+<span id="cb14-11"><a href="#cb14-11"></a><span class="co">#&gt; 1  left  iop_preop 32.5 1.3 4  31  34</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a><span class="co">#&gt; 2  left iop_postop 12.5 1.3 4  11  14</span></span>
+<span id="cb14-13"><a href="#cb14-13"></a><span class="co">#&gt; 3  left   va_preop 42.5 1.3 4  41  44</span></span>
+<span id="cb14-14"><a href="#cb14-14"></a><span class="co">#&gt; 4  left  va_postop 46.5 1.3 4  45  48</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a><span class="co">#&gt; 5 right  iop_preop 22.5 1.3 4  21  24</span></span>
+<span id="cb14-16"><a href="#cb14-16"></a><span class="co">#&gt; 6 right iop_postop 12.5 1.3 4  11  14</span></span>
+<span id="cb14-17"><a href="#cb14-17"></a><span class="co">#&gt; 7 right   va_preop 42.5 1.3 4  41  44</span></span>
+<span id="cb14-18"><a href="#cb14-18"></a><span class="co">#&gt; 8 right  va_postop 46.5 1.3 4  45  48</span></span>
 <span id="cb14-19"><a href="#cb14-19"></a></span>
 <span id="cb14-20"><a href="#cb14-20"></a><span class="kw">reveal</span>(clean_df, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;eye&quot;</span>, <span class="st">&quot;surgery&quot;</span>))</span>
-<span id="cb14-21"><a href="#cb14-21"></a><span class="co">#&gt;    eye surgery        var mean  sd n min max</span></span>
-<span id="cb14-22"><a href="#cb14-22"></a><span class="co">#&gt; 1    l     SLT  iop_preop 34.0  NA 1  34  34</span></span>
-<span id="cb14-23"><a href="#cb14-23"></a><span class="co">#&gt; 2    l     SLT iop_postop 14.0  NA 1  14  14</span></span>
-<span id="cb14-24"><a href="#cb14-24"></a><span class="co">#&gt; 3    l     SLT   va_preop 44.0  NA 1  44  44</span></span>
-<span id="cb14-25"><a href="#cb14-25"></a><span class="co">#&gt; 4    l     SLT  va_postop 48.0  NA 1  48  48</span></span>
-<span id="cb14-26"><a href="#cb14-26"></a><span class="co">#&gt; 5    r     SLT  iop_preop 23.5 0.7 2  23  24</span></span>
-<span id="cb14-27"><a href="#cb14-27"></a><span class="co">#&gt; 6    r     SLT iop_postop 13.5 0.7 2  13  14</span></span>
-<span id="cb14-28"><a href="#cb14-28"></a><span class="co">#&gt; 7    r     SLT   va_preop 43.5 0.7 2  43  44</span></span>
-<span id="cb14-29"><a href="#cb14-29"></a><span class="co">#&gt; 8    r     SLT  va_postop 47.5 0.7 2  47  48</span></span>
-<span id="cb14-30"><a href="#cb14-30"></a><span class="co">#&gt; 9    l      TE  iop_preop 32.0 1.0 3  31  33</span></span>
-<span id="cb14-31"><a href="#cb14-31"></a><span class="co">#&gt; 10   l      TE iop_postop 12.0 1.0 3  11  13</span></span>
-<span id="cb14-32"><a href="#cb14-32"></a><span class="co">#&gt; 11   l      TE   va_preop 42.0 1.0 3  41  43</span></span>
-<span id="cb14-33"><a href="#cb14-33"></a><span class="co">#&gt; 12   l      TE  va_postop 46.0 1.0 3  45  47</span></span>
-<span id="cb14-34"><a href="#cb14-34"></a><span class="co">#&gt; 13   r      TE  iop_preop 21.5 0.7 2  21  22</span></span>
-<span id="cb14-35"><a href="#cb14-35"></a><span class="co">#&gt; 14   r      TE iop_postop 11.5 0.7 2  11  12</span></span>
-<span id="cb14-36"><a href="#cb14-36"></a><span class="co">#&gt; 15   r      TE   va_preop 41.5 0.7 2  41  42</span></span>
-<span id="cb14-37"><a href="#cb14-37"></a><span class="co">#&gt; 16   r      TE  va_postop 45.5 0.7 2  45  46</span></span></code></pre></div>
+<span id="cb14-21"><a href="#cb14-21"></a><span class="co">#&gt;      eye surgery        var mean  sd n min max</span></span>
+<span id="cb14-22"><a href="#cb14-22"></a><span class="co">#&gt; 1   left     SLT  iop_preop 34.0  NA 1  34  34</span></span>
+<span id="cb14-23"><a href="#cb14-23"></a><span class="co">#&gt; 2   left     SLT iop_postop 14.0  NA 1  14  14</span></span>
+<span id="cb14-24"><a href="#cb14-24"></a><span class="co">#&gt; 3   left     SLT   va_preop 44.0  NA 1  44  44</span></span>
+<span id="cb14-25"><a href="#cb14-25"></a><span class="co">#&gt; 4   left     SLT  va_postop 48.0  NA 1  48  48</span></span>
+<span id="cb14-26"><a href="#cb14-26"></a><span class="co">#&gt; 5  right     SLT  iop_preop 23.5 0.7 2  23  24</span></span>
+<span id="cb14-27"><a href="#cb14-27"></a><span class="co">#&gt; 6  right     SLT iop_postop 13.5 0.7 2  13  14</span></span>
+<span id="cb14-28"><a href="#cb14-28"></a><span class="co">#&gt; 7  right     SLT   va_preop 43.5 0.7 2  43  44</span></span>
+<span id="cb14-29"><a href="#cb14-29"></a><span class="co">#&gt; 8  right     SLT  va_postop 47.5 0.7 2  47  48</span></span>
+<span id="cb14-30"><a href="#cb14-30"></a><span class="co">#&gt; 9   left      TE  iop_preop 32.0 1.0 3  31  33</span></span>
+<span id="cb14-31"><a href="#cb14-31"></a><span class="co">#&gt; 10  left      TE iop_postop 12.0 1.0 3  11  13</span></span>
+<span id="cb14-32"><a href="#cb14-32"></a><span class="co">#&gt; 11  left      TE   va_preop 42.0 1.0 3  41  43</span></span>
+<span id="cb14-33"><a href="#cb14-33"></a><span class="co">#&gt; 12  left      TE  va_postop 46.0 1.0 3  45  47</span></span>
+<span id="cb14-34"><a href="#cb14-34"></a><span class="co">#&gt; 13 right      TE  iop_preop 21.5 0.7 2  21  22</span></span>
+<span id="cb14-35"><a href="#cb14-35"></a><span class="co">#&gt; 14 right      TE iop_postop 11.5 0.7 2  11  12</span></span>
+<span id="cb14-36"><a href="#cb14-36"></a><span class="co">#&gt; 15 right      TE   va_preop 41.5 0.7 2  41  42</span></span>
+<span id="cb14-37"><a href="#cb14-37"></a><span class="co">#&gt; 16 right      TE  va_postop 45.5 0.7 2  45  46</span></span></code></pre></div>
 </div>
 </div>
 <div id="getage" class="section level2">
 <h2>Calculate age</h2>
 <p>This is a simple function and should not require much explanation. However, it may be noteworthy to mention the subtle distinction of periods and durations, which are an idiosyncrasy of time measurements and well explained <a href="https://lubridate.tidyverse.org/articles/lubridate.html#time-intervals">in this thread.</a></p>
-<div id="examples-4" class="section level3">
+<div id="examples-3" class="section level3">
 <h3>Examples</h3>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>dob &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;1984-10-16&quot;</span>, <span class="st">&quot;2000-01-01&quot;</span>)</span>
 <span id="cb15-2"><a href="#cb15-2"></a></span>

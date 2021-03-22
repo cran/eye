@@ -7,9 +7,7 @@ eye
 
 [![Travis build
 status](https://travis-ci.com/tjebo/eye.svg?branch=master)](https://travis-ci.com/tjebo/eye)
-<!-- badges: end -->
-
-See more with *eye*
+<!-- badges: end --> See more with *eye*
 
 ## Purpose
 
@@ -19,9 +17,9 @@ research.
 ## Features
 
   - [Handling of visual acuity notations](#visual-acuity)
-  - [Easy count of patients and eyes](#count-patients-and-eyes), return
-    a vector or a text for your report
-  - [Easy recoding of your eye variable](#recoding-the-eye-variable)
+  - [Super easy count of subjects and eyes](#count-subjects-and-eyes),
+    with smooth integration in your rmarkdown report
+  - [Recode your eye variable](#recoding-the-eye-variable)
   - Reshape your eye data - [long](#myop) or [wide](#hyperop)
   - [Quick summary of your eye data](#blink)
   - [Get common summary statistics](#reveal)
@@ -132,37 +130,59 @@ va_mixed(x, to = "snellen", possible = c("snellen", "logmar", "etdrs"))
 #>  [7] "20/40"    "20/32"    "20/4000"  "20/200"
 ```
 
-### Count patients and eyes
+### Count subjects and eyes
 
-Use `eyes` to return a vector, and `eyestr` to return a string for your
-report.
+This is a massive convenience function to count subjects and eyes.
+Because this essentially returns a list, the stored data can easily be
+accessed by subsetting (e.g., with `$`). You can get the subject IDs for
+each subset with `details = TRUE`.
 
 ``` r
 library(eyedata)
 eyes(amd2)
-#> patients     eyes    right     left 
-#>     3357     3357     1681     1676
+#> ══ Counts ═══════════════
+#>    id  eyes right  left 
+#>  3357  3357  1681  1676
 
-# Same as `eyes`, but as text for reports
-eyestr(amd2)
-#> [1] "3357 eyes of 3357 patients"
+eyes(amd2)$right
+#> [1] 1681
 
-## Numbers smaller than or equal to 12 will be real English
-eyestr(head(amd2, 100))
-#> [1] "eleven eyes of eleven patients"
+eyes(amd2, details = TRUE)
+#> ══ $counts ══════════════════════════════════
+#>    id  eyes right  left  both 
+#>  3357  3357  1681  1676     0 
+#> 
+#> ══ $id ══════════════════════════════════════
+#> $right
+#> [1] "id_100"  "id_1001" "id_1002" "id_1003" "id_1007" "id_1009"
+#> # … with 1675 more subjects
+#> 
+#> $left
+#> [1] "id_1"    "id_10"   "id_1000" "id_1004" "id_1005" "id_1006"
+#> # … with 1670 more subjects
+#> 
+#> $both
+#> character(0)
 
-## Or, you can make all numbers english:
-eyestr(amd2, english = "all")
-#> [1] "three thousand three hundred and fifty-seven eyes of three thousand three hundred and fifty-seven patients"
-
-## make first number capital letter
-eyestr(head(amd2, 100), caps = TRUE)
-#> [1] "Eleven eyes of eleven patients"
-
-## you can have all numbers printed as numbers
-eyestr(head(amd2, 100), english = "none")
-#> [1] "11 eyes of 11 patients"
+head(eyes(amd2, details = TRUE)$id$right)
+#> [1] "id_100"  "id_1001" "id_1002" "id_1003" "id_1007" "id_1009"
 ```
+
+#### Smooth integration into rmarkdown
+
+`eyestr` was designed with the use in rmarkdown in mind, most explicitly
+for the use inline. You can change the way numbers are converted to
+english with the `english` argument. By default, numbers smaller than or
+equal to 12 will be real English, all other numbers will be … numbers.
+You can capitalise the first number with the `caps` argument.
+
+| rmarkdown code                                                  | results in                                                                                                             |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| We analyzed `` `r eyestr(amd2)` ``                              | We analyzed 3357 eyes of 3357 patients                                                                                 |
+| We analyzed `` `r eyestr(head(amd2, 100))` ``                   | We analyzed eleven eyes of eleven patients                                                                             |
+| We analyzed `` `r eyestr(amd2, english = "all")` ``             | We analyzed three thousand three hundred and fifty-seven eyes of three thousand three hundred and fifty-seven patients |
+| `` `r eyestr(head(amd2, 100), caps = TRUE)` `` were analyzed    | Eleven eyes of eleven patients were analyzed                                                                           |
+| We analyzed `` `r eyestr(head(amd2, 100), english = "none")` `` | We analyzed 11 eyes of 11 patients                                                                                     |
 
 ### Recoding the eye variable
 
@@ -170,12 +190,7 @@ Makes recoding eye variables very easy. It deals with weird missing
 entries like `"."` and `""`, or `"N/A"`
 
 ``` r
-x <- c("r", "re", "od", "right", "l", "le", "os", "left")
-recodeye(x)
-#> [1] "r" "r" "r" "r" "l" "l" "l" "l"
-
-## or with "both eyes"
-x <- c(x, "both", "ou")
+x <- c("r", "re", "od", "right", "l", "le", "os", "left", "both", "ou")
 recodeye(x)
 #>  [1] "r" "r" "r" "r" "l" "l" "l" "l" "b" "b"
 
@@ -196,11 +211,18 @@ recodeye(x)
 #> Eyes coded 1:2. Interpreting r = 1
 #> [1] "r" "l" NA  NA  NA  NA
 
-## Or if you have weird codes for eyes
-x <- c("alright", "righton", "lefty","leftover")
-
-recodeye(x, eyecodes = list(r = c("alright","righton"), l = c("lefty","leftover")))
+## If you are using different strings to code for eyes, e.g., you are using a different language, you can change this either with the "eyestrings" argument
+french <- c("OD", "droit", "gauche", "OG")
+recodeye(french, eyestrings = list(r = c("droit", "od"), l = c("gauche", "og")))
 #> [1] "r" "r" "l" "l"
+
+## or change it more globally with `set_eye_strings`
+set_eye_strings(right = c("droit", "od"), left = c("gauche", "og"))
+recodeye(french)
+#> [1] "r" "r" "l" "l"
+
+# to restore the default, call set_eye_strings empty
+set_eye_strings()
 ```
 
 ### Clean NA entries
@@ -283,22 +305,25 @@ to a “myop” format.
 
 ``` r
 ## Simple data frame with one column for right eye and left eye.
+iop_wide <- data.frame(id = letters[1:3], iop_r = 11:13, iop_l = 14:16)
 iop_wide
 #>   id iop_r iop_l
 #> 1  a    11    14
 #> 2  b    12    15
 #> 3  c    13    16
+```
 
+``` r
 myop(iop_wide)
 #> # A tibble: 6 x 3
 #>   id    eye   iop  
 #>   <chr> <chr> <chr>
-#> 1 a     r     11   
-#> 2 a     l     14   
-#> 3 b     r     12   
-#> 4 b     l     15   
-#> 5 c     r     13   
-#> 6 c     l     16
+#> 1 a     right 11   
+#> 2 a     left  14   
+#> 3 b     right 12   
+#> 4 b     left  15   
+#> 5 c     right 13   
+#> 6 c     left  16
 ```
 
 Or another example with many more variables:
@@ -330,14 +355,14 @@ myop_df
 #> # A tibble: 8 x 7
 #>   id    eye   surgery iop_preop iop_postop va_preop va_postop
 #>   <chr> <chr> <chr>   <chr>     <chr>      <chr>    <chr>    
-#> 1 a     r     TE      21        11         41       45       
-#> 2 a     l     TE      31        11         41       45       
-#> 3 b     r     TE      22        12         42       46       
-#> 4 b     l     TE      32        12         42       46       
-#> 5 c     r     SLT     23        13         43       47       
-#> 6 c     l     TE      33        13         43       47       
-#> 7 d     r     SLT     24        14         44       48       
-#> 8 d     l     SLT     34        14         44       48
+#> 1 a     right TE      21        11         41       45       
+#> 2 a     left  TE      31        11         41       45       
+#> 3 b     right TE      22        12         42       46       
+#> 4 b     left  TE      32        12         42       46       
+#> 5 c     right SLT     23        13         43       47       
+#> 6 c     left  TE      33        13         43       47       
+#> 7 d     right SLT     24        14         44       48       
+#> 8 d     left  SLT     34        14         44       48
 ```
 
 ### hyperop
@@ -379,56 +404,6 @@ codes**](#names-and-codes)
 
 ``` r
 blink(wide_df)
-#> The lifecycle of blink() has expired. It will no longer be
-#>   maintained, but will be kept in the package.
-#> From etdrs
-#> From etdrs
-#> 
-#> ── blink ───────────────────────────────────────────────────────────────────────
-#> ══ Data ════════════════════════════════
-#> # A tibble: 8 x 7
-#>   id    eye   surgery iop_preop iop_postop va_preop va_postop
-#>   <chr> <chr> <chr>   <chr>     <chr>      <logmar> <logmar> 
-#> 1 a     r     TE      21        11         0.88     0.80     
-#> 2 a     l     TE      31        11         0.88     0.80     
-#> 3 b     r     TE      22        12         0.86     0.78     
-#> 4 b     l     TE      32        12         0.86     0.78     
-#> 5 c     r     SLT     23        13         0.84     0.76     
-#> 6 c     l     TE      33        13         0.84     0.76     
-#> 7 d     r     SLT     24        14         0.82     0.74     
-#> 8 d     l     SLT     34        14         0.82     0.74     
-#> 
-#> ══ Count of patient and eyes ═══════════
-#> patients     eyes    right     left 
-#>        4        8        4        4 
-#> 
-#> ══ Visual acuity ═══════════════════════
-#> 
-#> ── $VA_total (all eyes)
-#>         var mean sd n min max
-#> 1  va_preop  0.8  0 8 0.8 0.9
-#> 2 va_postop  0.8  0 8 0.7 0.8
-#> 
-#> ── $VA_eyes (right and left eyes)
-#>   eye       var mean sd n min max
-#> 1   l  va_preop  0.8  0 4 0.8 0.9
-#> 2   l va_postop  0.8  0 4 0.7 0.8
-#> 3   r  va_preop  0.8  0 4 0.8 0.9
-#> 4   r va_postop  0.8  0 4 0.7 0.8
-#> 
-#> ══ Intraocular pressure ════════════════
-#> 
-#> ── $IOP_total (all eyes)
-#>          var mean  sd n min max
-#> 1  iop_preop 27.5 5.5 8  21  34
-#> 2 iop_postop 12.5 1.2 8  11  14
-#> 
-#> ── $IOP_eyes (right and left eyes)
-#>   eye        var mean  sd n min max
-#> 1   l  iop_preop 32.5 1.3 4  31  34
-#> 2   l iop_postop 12.5 1.3 4  11  14
-#> 3   r  iop_preop 22.5 1.3 4  21  24
-#> 4   r iop_postop 12.5 1.3 4  11  14
 ```
 
 ## Names and codes

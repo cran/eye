@@ -41,11 +41,7 @@ to_logmar(x, smallstep = TRUE)
 to_snellen(x, noplus = TRUE)
 
 ## -----------------------------------------------------------------------------
-x <- c("r", "re", "od", "right", "l", "le", "os", "left")
-recodeye(x)
-
-## or with "both eyes"
-x <- c(x, "both", "ou")
+x <- c("r", "re", "od", "right", "l", "le", "os", "left", "both", "ou")
 recodeye(x)
 
 ## chose the resulting codes
@@ -59,42 +55,20 @@ recodeye(x)
 x <- c(1:2, ".", NA, "", "    ")
 recodeye(x)
 
-## Or if you have weird codes for eyes
-x <- c("alright", "righton", "lefty","leftover")
+## If you are using different strings to code for eyes, e.g., you are using a different language, you can change this either with the "eyestrings" argument
+french <- c("OD", "droit", "gauche", "OG")
+recodeye(french, eyestrings = list(r = c("droit", "od"), l = c("gauche", "og")))
 
-recodeye(x, eyecodes = list(r = c("alright","righton"), l = c("lefty","leftover")))
+## or change it more globally with `set_eye_strings`
+set_eye_strings(right = c("droit", "od"), left = c("gauche", "og"))
+recodeye(french)
 
-## ----eyestr-------------------------------------------------------------------
-eyes(amd2)
+# to restore the default, call set_eye_strings empty
+set_eye_strings()
 
-library(eyedata)
-eyes(amd2)
-
-# Same as `eyes`, but as text for reports
-eyestr(amd2)
-
-## Numbers smaller than or equal to 12 will be real English
-eyestr(head(amd2, 100))
-
-## Or, you can make all numbers english:
-eyestr(amd2, english = "all")
-
-## make first number capital letter
-eyestr(head(amd2, 100), caps = TRUE)
-
-## you can have all numbers printed as numbers
-eyestr(head(amd2, 100), english = "none")
-
-## -----------------------------------------------------------------------------
-## the variable has not been exactly named, (but it is probably IOP data), 
-## you can specify the dimension with the var argument
+## ----data frames--------------------------------------------------------------
 wide1 <- data.frame(id = letters[1:3],  r = 11:13 , l = 14:16)
-myop(wide1, var = "iop")
-
-## If the dimension is already part of the column names, this is not necessary. 
 iop_wide <- data.frame(id = letters[1:3], iop_r = 11:13, iop_l = 14:16)
-myop(iop_wide)
-
 ## Mildly messy data frame with several variables spread over two columns:
 wide_df <- data.frame(
   id = letters[1:4], 
@@ -105,6 +79,15 @@ wide_df <- data.frame(
   va_r_preop = 41:44, va_r_postop = 45:48,
   va_l_preop = 41:44, va_l_postop = 45:48
 )
+
+## -----------------------------------------------------------------------------
+## the variable has not been exactly named, (but it is probably IOP data), 
+## you can specify the dimension with the var argument
+
+myop(wide1, var = "iop")
+
+## If the dimension is already part of the column names, this is not necessary. 
+myop(iop_wide)
 
 ## myop deals with this in a breeze:
 myop(wide_df)

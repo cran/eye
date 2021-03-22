@@ -5,18 +5,24 @@
 \alias{eyestr}
 \title{Count patients and eyes}
 \usage{
-eyes(x, id = NULL, eye = NULL, dropunknown = TRUE)
+eyes(x, id_col = NULL, eye_col = NULL, dropunknown = TRUE, details = FALSE)
 
 eyestr(x, ..., english = "small", caps = FALSE)
 }
 \arguments{
 \item{x}{required. (data frame)}
 
-\item{id}{Patient identifying column, passed as (quoted) character}
+\item{id_col}{Subject identifying column, passed as (quoted) character
+Can also be abbreviated to "id" as per partial matching}
 
-\item{eye}{Eye identifying column, passed as (quoted) character}
+\item{eye_col}{Eye identifying column, passed as (quoted) character.
+Can also be abbreviated to "eye" as per partial matching}
 
 \item{dropunknown}{introduces NA for values not recognized by \link{recodeye}}
+
+\item{details}{if TRUE, will add information about which and how many
+subjects have only one eye or both included, and provide a list of
+subject IDs for each}
 
 \item{...}{passed to \link{eyes}}
 
@@ -27,18 +33,20 @@ or "none" (or any other string!) for none}
 \item{caps}{if TRUE, first number will have capital first letter}
 }
 \value{
-\code{eyes}: Named integer vector with count of patients and eyes
+List (of class "eyes" with count of patients and eyes
+if "details = TRUE", an list of class "eyes_details" will be returned
 
 \code{eyestr}: Character string - can be directly pasted into reports
 }
 \description{
-Counts number of patients and right and left eyes. Columns are
+Counts number of subjects and right and left eyes. Columns are
 guessed.
 }
-\section{Guessing}{
+\section{Column guessing}{
 
-\strong{id} and \strong{eye} arguments overrule the name guessing for
-the respective columns (here, cases need to match)
+\strong{id_col} and \strong{eye_col} arguments overrule the name guessing for
+the respective columns (here, cases need to match). Both arguments can be
+abbreviated (\emph{id} or \emph{eye}) as per partial argument name matching.
 
 For any below, \strong{cases are always ignored} (column names can be in upper or
 lower case, as you please)
@@ -46,15 +54,17 @@ lower case, as you please)
 \strong{patient ID columns}:
 \itemize{
 \item First, \code{eyes} is looking for names that contain both strings
-"pat" and "id" (the order doesn't matter)
+"pat" and "id" (the order doesn't matter) -
+you can change this with \link{set_eye_strings}
 \item Next, it will look for columns that are plainly called "ID"
 \item Last, it will search for all names that contain either "pat"
 or "id"
 }
 
-\strong{eye variable column}:
+\strong{eye column}:
 \itemize{
 \item \code{eyes} primarily looks for columns called either "eye" or "eyes",
+(you can change this with \link{set_eye_strings})
 and if they are not present, columns containing string "eye"
 (e.g., EyeName will be recognized)
 }
@@ -62,7 +72,7 @@ and if they are not present, columns containing string "eye"
 
 \section{Eye coding}{
 
-The following codes are recognized:
+The following codes are recognized: (change this with \link{set_eye_strings})
 \itemize{
 \item integer coding 0:1 and 1:2, right eye being the lower number.
 \item right eyes: c("r", "re", "od", "right") and
@@ -77,20 +87,24 @@ coding remains unclear). Recommend then to recode with \link{recodeye}
 
 \section{eyestr}{
 
-eyestr is a wrapper around eyes. It parses the result into meaningful text,
-which can be #'  readily pasted into reports with \link{eyes_to_string} under the hood.
-Arguments to \code{eyes_to_string} are passed via \strong{...}:
-\itemize{
-\item \strong{small_num} If TRUE (default): numbers <= 12 as words
-\item \strong{UK} TRUE: UK style (English) or FALSE (default):
-US style (American).
-}
+eyestr creates a string which can be pasted into reports.
+It currently only supports "x eyes of n patient(s)" This is a limitation,
+but I guess in the vast majority  of cases will be "correct".
+To use for other categories (e.g., "people" or "participants"), use
+\code{eyes(...)[1]}
 }
 
 \examples{
 library(eyedata)
 eyes(amd2)
 
+## If you code your eyes with different strings,
+## e.g., because you are using a different language,
+## you can change this either with `set_eye_strings`
+set_eye_strings(right = c("droit", "od"), left = c("gauche", "og"))
+
+## restore defaults with
+set_eye_strings()
 # Examples for the usage of eyestr
 eyestr(amd2)
 

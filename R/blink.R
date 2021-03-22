@@ -105,19 +105,19 @@ blink <- function(x, va_to = "logmar",
       x_exp <- rlang::enquo(va_cols)
       va_index <- unname(tidyselect::eval_select(x_exp, x))
   } else {
-    va_index <- which(names(x) %in% getElem_va(x))
+    va_index <- which(names(x) %in% getElem_va(names(x)))
   }
   if(!rlang::quo_is_null(rlang::enquo(iop_cols))){
     x_exp <- rlang::enquo(iop_cols)
     iop_index <- unname(tidyselect::eval_select(x_exp, x))
   } else {
-    iop_index <- which(names(x) %in% getElem_iop(x))
+    iop_index <- which(names(x) %in% getElem_iop(names(x)))
   }
 
   names(x) <- myop_rename(x)
   x_myop <- myopizer(x)
 
-  eye_cols <- whole_str(c("eyes", "eye"))(names(x_myop))
+  eye_cols <- whole_str(names(x_myop), c("eyes", "eye"))
 
   if (length(va_index) < 1){
     message("No VA column detected")
@@ -127,7 +127,7 @@ blink <- function(x, va_to = "logmar",
     va_false <- remCols(x = x, cols = va_index, fct_level = fct_level)
     va_true <- va_index[va_false]
     names_va <- names(x)[va_true]
-    new_names_va <- unique(gsub("^(r|l)_", "", names_va))
+    new_names_va <- unique(gsub("^(right|left)_", "", names_va))
     #update VA with VA
     x_myop <- dplyr::mutate_at(x_myop, new_names_va, .funs = va, to = va_to)
     # summary for VA cols (based on new names!)
@@ -146,7 +146,7 @@ blink <- function(x, va_to = "logmar",
     iop_false <- remCols(x = x, cols = iop_index, fct_level = fct_level)
     iop_true <- iop_index[iop_false]
     names_iop <- names(x)[iop_true]
-    new_names_iop <- unique(gsub("^(r|l)_", "", names_iop))
+    new_names_iop <- unique(gsub("^(right|left)_", "", names_iop))
     res_iop <- reveal(x_myop[new_names_iop])
     if(length(eye_cols) > 0){
       res_iop_eyes <-
@@ -185,10 +185,10 @@ remCols <- function(x, cols, fct_level) {
     y <- x[[col]]
     y_new <- tolower(suppressWarnings(as.character(y)))
 
-    if (all(y_new[!is.na(y_new)] %in% unlist(set_codes()["quali"]))) {
+    if (all(y_new[!is.na(y_new)] %in% eye_codes$quali)) {
       return(TRUE)
     }
-    y_noquali <- y_new[!y_new %in% unlist(set_codes()["quali"])]
+    y_noquali <- y_new[!y_new %in% eye_codes$quali]
     y_num <- suppressWarnings(as.numeric(y_noquali))
 
     if (any(grepl("/", y_noquali))) {

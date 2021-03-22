@@ -6,6 +6,8 @@
 \alias{print.logmar}
 \alias{print.etdrs}
 \alias{print.blink}
+\alias{print.eyes}
+\alias{print.eyes_details}
 \title{print eye classes}
 \usage{
 \method{print}{snellen}(x, ...)
@@ -15,11 +17,17 @@
 \method{print}{etdrs}(x, ...)
 
 \method{print}{blink}(x, ...)
+
+\method{print}{eyes}(x, ...)
+
+\method{print}{eyes_details}(x, show = 6, ...)
 }
 \arguments{
-\item{x}{object of class "blink"}
+\item{x}{object of class "eyes_details"}
 
 \item{...}{arguments passed to \link{print.default}}
+
+\item{show}{how many subjects to be shown before printing the footnote}
 }
 \value{
 No return value, called for side effects (printing)
@@ -30,5 +38,9 @@ S3 methods for VA classes "snellen", "logmar" and "etdrs".
 than continuous. \strong{logmar} and \strong{etdrs} are both numerics
 (logMAR is double, etdrs is integer).
 
-S3 methods for blink class
+S3 methods for class blink
+
+S3 methods for class eyes
+
+S3 methods for class eyes_details
 }
