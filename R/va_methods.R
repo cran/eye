@@ -53,7 +53,10 @@ convertVA <- function (x, ...) {
 convertVA.quali <- function(x, to, type, ...){
   matchcol <- paste0(to, type)
   new_va <- va_chart[[matchcol]][match(x, va_chart$quali[1:4])]
-  class(new_va) <- c(to, "va", "character")
+  if(to == "etdrs"){
+    new_va[new_va < 0] <- 0L
+  }
+  class(new_va) <- c(to, "va", class(new_va))
   new_va
 }
 
@@ -102,7 +105,7 @@ convertVA.snellen <- function(x, to, type, smallstep, noplus, ...) {
   if(noplus) {
     x_split <- strsplit(x, "(?<=.)(?=[-\\+])", perl = TRUE)
     snellenfrac <- sapply(x_split, `[[`, 1)
-    logmarval <- -log10(parse_snellen(snellenfrac))
+    logmarval <- round(-log10(parse_snellen(snellenfrac)), 1)
   } else {
   logmarval <- snellensteps(x, smallstep)
   }
@@ -162,7 +165,7 @@ convertVA.etdrs <- function(x, to, type, ...){
     new_va <- round(as.numeric(new_va), 2)
   } else if (to == "etdrs"){
     x[x < 0] <- 0
-    new_va <- x
+    new_va <- as.integer(x)
   } else if (to == "snellen"){
     match_col <- paste0(to, type)
     b <- va_chart$etdrs[!is.na(va_chart$etdrs)]

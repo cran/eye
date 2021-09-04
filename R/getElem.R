@@ -27,12 +27,15 @@ getElem_id <- function(obj) {
 
 #' @rdname getElem
 getElem_eyecol <- function(obj) {
-  if(length(grepl("^(eye|eyes)$", tolower(obj))) > 0){
-    eye_col <- obj[grepl("^(eye|eyes)$", tolower(obj))]
-  } else if (length(whole_str(obj, c("eye","eyes"))) > 0){
-    eye_col <- whole_str(obj, c("eye","eyes"))
+  eye_chr <- eye_codes$eye
+  eye_chr_coll <- paste0("^(", paste(eye_chr, collapse = "|"),")$")
+  is_eye_col <- obj[grepl(eye_chr_coll, tolower(obj))]
+  if(length(is_eye_col) > 0){
+    eye_col <- is_eye_col
+  } else if (length(whole_str(obj, eye_chr)) > 0){
+    eye_col <- whole_str(obj, eye_chr)
   } else {
-    eye_col <- part_str(obj, "eye")
+    eye_col <- part_str(obj, eye_chr)
   }
   eye_col
 }
