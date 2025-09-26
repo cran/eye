@@ -51,7 +51,7 @@ reveal <- function(x, by = NULL, dec = 1, funs = NULL) {
 #' @description S3 generic and methods
 #' @importFrom stats sd
 #' @return data frame
-#' @export
+#' @keywords internal
 revealEye <- function(x, ...){
   UseMethod("revealEye", x)
 }
@@ -86,7 +86,7 @@ revealEye.data.frame <- function(x, dec, funs, ...) {
     sum(is.na(x)) != length(x)
   }, x = x)
   if (!length(x) == length(x_num)) {
-    warning("reveal: character elements removed", call. = FALSE)
+    warning("reveal: character columns removed", call. = FALSE)
   }
   result <- lapply(funs, mapply, x_num)
   list_res <- lapply(result, function(y) round(y, digits = dec))
@@ -142,6 +142,8 @@ split_mult <- function(x, col,
                        sep = ""){
   cols <- stringr::str_split_fixed(x[[col]], pattern, n = Inf)
   cols[which(cols == "")] <- NA_character_
+  ## removing whitespace
+  cols <- data.frame(lapply(cols, trimws))
   m <- dim(cols)[2]
   if(length(into) == m){
     colnames(cols) <- into

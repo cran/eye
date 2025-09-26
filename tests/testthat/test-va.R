@@ -2,6 +2,8 @@ context("test va")
 library(eye)
 library(testthat)
 
+## objects for va() testing
+
 xtry <- c(NA, "nlp", 1:2, 1.1, -1, "20/40", "4/6", "6/1000", 34)
 logmar <- va_chart$logmar
 snellenft <- va_chart$snellenft
@@ -40,9 +42,10 @@ va_vec6 <- c("6/9", "6/6", "6/5", "6/12", "6/7.5", "6/18", "PL", "6/4",
              "6/2", "NPL", "NOT TESTED", "Not tested", "6/3", "Eye not present",
              "6/7")
 va_vec7 <- structure(c(NA, "6/9", "6/6", "6/18", "6/12", "6/5",
-             "6/24", "6/36", "6/60", "3/60" ),class = c("snellen",
-                                                      "va", "character"))
+                       "6/24", "6/36", "6/60", "3/60" ),class = c("snellen",
+                                                                  "va", "character"))
 va_vec8 <- structure(quali,class = c("quali", "va", "integer"))
+
 
 
 # $va_vec (length 8)
@@ -57,6 +60,7 @@ va_vec8 <- structure(quali,class = c("quali", "va", "integer"))
 # [1] NA  "CF""NA""HM""6/9"  "6/6"  "6/18" "6/12" "6/5"  "6/24" "6/36" "6/60" "3/60"
 # $va_vec5 (length 5)
 # [1] "20/200"  "20/200 + 3" "20/200+3""20/200-4""20/200 -4"
+
 
 test_that("output", {
   expect_equal(va(logmar), logmar)
@@ -147,26 +151,18 @@ test_that("No error / no warning", {
 }
 )
 
-test_that("NA", {
+test_that("NA_va", {
+
   expect_equal(sum(is.na(va(va_vec))), 2)
+  expect_equal(sum(is.na(va(va_vec4))), 2)
+  expect_equal(sum(is.na(va(va_vec6))), 5)
   expect_equal(suppressWarnings(sum(is.na(va(va_vecNA)))), 2)
   expect_equal(sum(is.na(va(va_vec1))), 0)
   expect_equal(sum(is.na(va(va_vec2))), 0)
   expect_equal(sum(is.na(va(va_vec3))), 0)
-  expect_equal(sum(is.na(va(va_vec4))), 2)
   expect_equal(sum(is.na(va(va_vec5))), 0)
-  expect_equal(sum(is.na(va(va_vec6))), 5)
   expect_equal(sum(is.na(va(va_vec8, to = "etdrs"))), 26)
   expect_equal(sum(is.na(va(va_vec8, to = "snellen", type = "dec"))), 26)
-  expect_equal(sum(is.na(eye:::convertVA(va_vec2, to = "snellen", "ft"))),0) #class logmar
-  expect_equal(sum(is.na(eye:::convertVA(va_vec2, to = "logmar", "ft"))),0) #class logmar
-  expect_equal(sum(is.na(eye:::convertVA(va_vec3, to = "etdrs", "ft"))),0) #class etdrs
-  expect_equal(sum(is.na(eye:::convertVA(va_vec3, to = "snellen", "ft"))),0) #class etdrs
-  expect_equal(sum(is.na(eye:::convertVA(va_vec3, to = "logmar", "ft"))),0) #class etdrs
-  expect_equal(sum(is.na(eye:::convertVA(va_vec7, smallstep = FALSE, noplus = FALSE, to = "snellen", "dec"))), 1) #class snellen
-  expect_equal(sum(is.na(eye:::convertVA(va_vec7,  smallstep = FALSE,noplus = FALSE,to = "etdrs", "ft"))),1) #class snellen
-  expect_equal(sum(is.na(eye:::convertVA(va_vec7, smallstep = FALSE, noplus = FALSE,to = "logmar", "ft"))),1) #class snellen
-  expect_equal(sum(is.na(eye:::convertVA(va_vec8, to = "snellen", "ft"))),26) #class quali
   expect_equal(sum(is.na(va(c(25, 23, 0.4), to = "snellen"))), 2) #class quali
   expect_equal(suppressWarnings(sum(is.na(va(mixed_VA2)))), 2)
   expect_equal(suppressWarnings(sum(is.na(va(mixed_VA)))), 3)
@@ -178,8 +174,38 @@ test_that("NA", {
   }
 )
 
+test_that("NA_convert",{
+  expect_equal(sum(is.na(eye:::convertVA(va_vec2, to = "snellen", "ft"))),0) #class logmar
+  expect_equal(sum(is.na(eye:::convertVA(va_vec2, to = "logmar", "ft"))),0) #class logmar
+  expect_equal(sum(is.na(eye:::convertVA(va_vec3, to = "etdrs", "ft"))),0) #class etdrs
+  expect_equal(sum(is.na(eye:::convertVA(va_vec3, to = "snellen", "ft"))),0) #class etdrs
+  expect_equal(sum(is.na(eye:::convertVA(va_vec3, to = "logmar", "ft"))),0) #class etdrs
+  expect_equal(sum(is.na(eye:::convertVA(va_vec7, smallstep = FALSE, noplus = FALSE, to = "snellen", "dec"))), 1) #class snellen
+  expect_equal(sum(is.na(eye:::convertVA(va_vec7,  smallstep = FALSE,noplus = FALSE,to = "etdrs", "ft"))),1) #class snellen
+  expect_equal(sum(is.na(eye:::convertVA(va_vec7, smallstep = FALSE, noplus = FALSE,to = "logmar", "ft"))),1) #class snellen
+  expect_equal(sum(is.na(eye:::convertVA(va_vec8, to = "snellen", "ft"))),26) #class quali
+
+})
+
+test_that("va_mixed", {
+  expect_equal(sum(is.na(va_mixed(mixed_VA, to = "logmar"))), 4)
+  expect_equal(va_mixed(mixed_VA, to = "logmar")[3], 1.64)
+  expect_equal(va_mixed(mixed_VA, to = "logmar", possible = c("logmar", "etdrs"))[3], 3)
+  expect_error(va_mixed(mixed_VA), regexp = NA)
+
+})
 
 
-
+test_that("quali_values", {
+expect_error(to_logmar(va_vec, quali_values = 2), regexp = "values need to be list")
+expect_error(to_snellen(va_vec, quali_values = 2), regexp = "needs to convert to logmar")
+expect_error(to_logmar(va_vec, quali_values = c(hm = 2)), regexp = "quali_values need to be list")
+expect_error(to_logmar(va_vec, quali_values = c(hm = 2)), regexp = "quali_values need to be list")
+expect_error(to_logmar(va_vec, quali_values = list(hm = 2, cf = 3)), regexp = "values need to be named list")
+expect_error(to_logmar(va_vec, quali_values = list(hm = 2, cf = 3, nlp = 4, lp = 5)), regexp = NA)
+expect_error(to_logmar(va_vec, quali_values = list(hm = "3", cf = 3, nlp = 4, lp = 5)), regexp = NA)
+expect_error(to_logmar(va_vec, quali_values = list(hm = "20/50", cf = 3, nlp = 4, lp = 5)), regexp = "quali_values need to contain only values that can be converted into numerics")
+}
+)
 
 

@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -39,6 +39,22 @@ to_logmar(x, smallstep = TRUE)
 
 ## or you can also decide to completely ignore them (converting them to the nearest snellen value in the VA chart)
 to_snellen(x, noplus = TRUE)
+
+## recognises various ways to write qualitative values such as "hand motion"
+y <- c(23, "20/50", "hand motion", "hm", "count fingers", "no light perception", "nlp", "nonsense")
+va(y)
+
+## you can set custom strings that are recognised as values
+set_eye_strings(nlp = c("nonsense", "nlp", "no light perception"))
+va(y)
+
+## reset to default with an empty call to set_eye_strings
+set_eye_strings()
+va(y)
+
+## use your own custom values for qualitative entries
+to_logmar(y)
+to_logmar(y, quali_values = list(cf = 2, hm = 3, lp = 4, nlp = 6 ))
 
 ## -----------------------------------------------------------------------------
 x <- c("r", "re", "od", "right", "l", "le", "os", "left", "both", "ou")
@@ -109,7 +125,7 @@ names(name_mess)
 names(name_mess) <- c("patID", "eye", "IOP", "VA")
 names(name_mess)
 
-## ---- include=FALSE-----------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------
 names(name_mess) <- c("name", "oculus", "eyepressure", "vision")
 
 ## -----------------------------------------------------------------------------

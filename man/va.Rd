@@ -4,7 +4,15 @@
 \alias{va}
 \title{Visual acuity notation conversion}
 \usage{
-va(x, from = NULL, to = NULL, type = "ft", smallstep = FALSE, noplus = FALSE)
+va(
+  x,
+  from = NULL,
+  to = NULL,
+  type = "ft",
+  smallstep = FALSE,
+  noplus = FALSE,
+  quali_values = NULL
+)
 }
 \arguments{
 \item{x}{Vector with visual acuity entries. Must be atomic.
@@ -26,6 +34,8 @@ entries equivalent to 0.02 logmar}
 
 \item{noplus}{ignoring plus/minus entries and just returning the
 snellen fraction. This overrides the smallstep argument.}
+
+\item{quali_values}{define your own values for qualitative entries (see details)}
 }
 \value{
 vector of \code{va} class. See also "VA classes"
@@ -41,11 +51,11 @@ between Snellen (decimal, meter and feet), ETDRS, and logMAR.
 the visual acuity chart (see section VA chart)
 \item \strong{Snellen to logMAR}: logMAR = -1 * log10(snellen_frac)
 \item \strong{Snellen to ETDRS}: ETDRS = 85 + 50 * log10(snellen_frac)
-\doi{10.1097/iae.0b013e3181d87e04}
+Gregori et al. DOI: 10.1097/iae.0b013e3181d87e04
 \item \strong{ETDRS to logMAR}: logMAR = -0.02 * etdrs + 1.7
-Beck et al. \doi{10.1016/s0002-9394(02)01825-1}
+Beck et al. DOI: 10.1016/s0002-9394(02)01825-1
 \item \strong{Hand movements and counting fingers} are converted following
-Schulze-Bonsel et al. - https://doi.org/10.1167/iovs.05-0981
+Schulze-Bonsel et al. DOI: 10.1167/iovs.05-0981
 \item \strong{(No) light perception} are converted following the suggestions by
 \href{https://michaelbach.de/sci/acuity.html}{Michael Bach}
 }
@@ -59,8 +69,27 @@ Qualitative visual acuity lower than counting fingers is assigned 0
 ETDRS letter, in order to keep it as a measurement (not: NA). It is very
 difficult to justify a "negative" letter score in a test which only has
 a specific range (0-100).
+By default, \code{va} recognises the following values (case does not matter!)
 \itemize{
-\item \strong{To Snellen}:
+\item No light perception := c("nlp", "no light perception", "no light", "no perception of light", "npl"),
+\item Light perception: = c("lp", "light perception", "perception of light", "pl"),
+\item Hand movements: = c("hm",  "handmotion", "hand movement", "hand movements"),
+\item Counting fingers: = c("cf", "counting finger", "counting fingers", "finger count", "count fingers")
+}
+}
+
+\section{Custom values for qualitative entries}{
+
+To define your own values for qualitative entries, you need to
+pass a names list with names c("cf", "hm", "nlp", "lp") - in that order.
+It accepts only values that can be reasonably converted into numeric values
+and it converts only to logMAR.
+If you want to convert to a different notation, you will need to
+call va() a second time.
+}
+
+\section{Converting to Snellen}{
+
 Although there seems to be no good statistical reason to convert
 back to Snellen, it is a very natural thing to eye specialists to think
 in Snellen. A conversion to snellen gives a good gauge of how the visual
@@ -70,16 +99,16 @@ in very weird Snellen values that have no correspondence to common charts.
 Therefore, Snellen matching the nearest ETDRS and logMAR value in
 the VA chart are used.
 }
-}
 
 \section{VA chart}{
 
-You can find with eye:::va_chart.
+You can find the chart with \code{eye:::va_chart}.
 This chart and VA conversion formulas are based on charts in
-Holladay et al.\doi{10.1016/j.jcrs.2004.01.014}, Beck et al.
-\doi{10.1016/s0002-9394(02)01825-1}{Beck et al.}, and
-Gregori et al.\doi{10.1097/iae.0b013e3181d87e04}.
-The etdrs values for NLP and PL are deliberately set at those values because
+Holladay et al. DOI: 10.1016/j.jcrs.2004.01.014,
+Beck et al. DOI: 10.1016/s0002-9394(02)01825-1, and
+Gregori et al. DOI: 10.1097/iae.0b013e3181d87e04.
+
+The ETDRS values for NLP and PL are deliberately set at those values because
 they are unlikely to happen by chance as a wrong entry (and as integers),
 and it has internal reasons that make conversion easier.
 }
@@ -109,10 +138,12 @@ Use \link{va_mixed} instead.
 \section{Snellen "+/-" entries}{
 
 By default, plus/minus entries are evaluated as intended by the
-test design: Snellen fractions increase/decrease only by lines.\preformatted{- if entry -2 to +2 : take same Snellen value
+test design: Snellen fractions increase/decrease only by lines.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{- if entry -2 to +2 : take same Snellen value
 - if < -2 : take Snellen value one line below
 - if > +2 : take Snellen value one line above
-}
+}\if{html}{\out{</div>}}
 
 If smallstep = TRUE, each snellen optotype will be considered
 equivalent to 0.02 logmar (assuming 5 letters in a row in a chart)
@@ -129,39 +160,38 @@ For more details see \code{\link[=clean_va]{clean_va()}}
 
 \section{VA classes}{
 
-convertVA returns a vector of three classes:
+Under the hood, \code{convertVA} returns a vector that has three classes:
 \enumerate{
 \item \code{va}
 \item One of snellen, snellendec, logmar, etdrs or quali.
-\item Either of \code{character} (for Snellen, snellendec, and qualitative),
+\item Either of \code{character} (for Snellen, Snellen decimal, and qualitative),
 \code{numeric} (for logMAR), or \code{integer} (for ETDRS).
 }
 }
 
 \examples{
-## will automatically detect VA class and convert to logMAR by default
-## ETDRS letters
-x <- c(23, 56, 74, 58)
+## calling va without specifying "to" will clean visual acuity entries
+## without conversion into another notation. Weird entries will be
+## replaced by a missing value that R recognises as such
+x <- c(23, "", NA, "N/A", "Not measured", "20/50", 74, 58)
 va(x)
 
 ## ... or convert to snellen
 va(x, to = "snellen")
 
-## snellen, mixed with categories. Also dealing with those "plus/minus" entries
+## Dealing with those "plus/minus" entries, and qualitative values such as "HM"
 va(c("NLP", "NPL", "PL", "LP", "HM", "CF", "6/60", "20/200", "6/9",
- "20/40", "20/40+3", "20/50-2"))
+ "20/40", "20/40+3", "20/50-2"), to = "snellen")
 
 ## A mix of notations is also possible
 x <- c("NLP", "0.8", "34", "3/60", "2/200", "20/40+3", "20/50-2")
-va(x)
+va(x, to = "snellen")
 
 ## Any fraction is possible, and empty values
+## change Snellen type to meter with type = "m"
 x <- c("CF", "3/60", "2/200", "", "20/40+3", ".", "      ")
-va(x)
+va(x, to = "snellen", type = "m")
 
-## but this not any fraction when converting from one class to the other
-x <- c("3/60", "2/200", "6/60", "20/200", "6/9")
-va(x, to="snellen", type = "m")
 }
 \seealso{
 Other Ophthalmic functions: 

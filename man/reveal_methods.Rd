@@ -40,7 +40,8 @@ S3 generic and methods
 }
 \seealso{
 Other revealer: 
-\code{\link{reveal_split}()},
-\code{\link{reveal}()}
+\code{\link{reveal}()},
+\code{\link{reveal_split}()}
 }
 \concept{revealer}
+\keyword{internal}

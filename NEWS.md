@@ -1,4 +1,17 @@
-## 1.2.1
+## eye 1.3.0
+- new functionality for qualitative visual acuity entries: 
+1) More values recognised as qualitative entries, and one can define values that are being recognized using `set_eye_strings`.(#36) 
+2) You can now set custom values for qualitative entries (hand movements, count fingers etc) using the "quali_values" argument in `va`
+- `recodeye` and `eyes` now also recognize "BE" as coding string for "both eyes"
+- updated package documentation file  
+- updated hyperlinks 
+- fixed issues #43, #48, #50
+- removed clean_va and alias cleanVA from exported namespace to keep it simpler
+- Improved warning when removing character column in `reveal()`
+- moved `revealEye` generic to internal functions
+- `va_mixed`: added default to `possible` argument, thus removing snellen decimals from recognised notations by default. 
+
+## eye 1.2.1
 Bug fixes: 
 - if no eye column is found, `eyes` also returns a list #31
 - `set_eye_strings` also updates eye column #32 
@@ -8,7 +21,7 @@ Bug fixes:
 - logMAR will return rounded values to the first digit when `noplus = TRUE` #37
 - `to_etdrs` from pure qualitative values correctly returns 0 for NPL and PL #38
 
-## 1.2.0
+## eye 1.2.0
 Summary of changes: 
 - `eyes()` - now returns lists (of class "eyes") for easier access of count data
 - `set_eye_strings()` - set string codes globally! This makes it easier for people using different languages to use eye.
@@ -28,7 +41,7 @@ Simplifications:
 - removed ..._chr arguments from getElem_... functions (redundant)
 - getElem... now only for vectors (because they were anyways only used for vectors)
 
-## 1.1.0  
+## eye 1.1.0  
 summary of changes: 
 - new features for function `eyestr`
 - important bug fixes
@@ -44,7 +57,7 @@ Details:
 - recodeye fixed fail when trailing white space (#28)
 - which_va fixed conversion error when mixed ETDRS and logmar (#29)
 
-# eye 1.0.1
+## eye 1.0.1
 - Nasty bug fix! Erroneous conversion of quality visual acuity entries when ETDRS (#24)
 - removed deprecated function `age()`
 - VA chart now as internal data, not exported - ideally the VA chart should not
@@ -53,11 +66,11 @@ be necessary anyways. However, if you really need to see it, you can still acces
   - convertVA 
   - checkVA
   
-# eye 1.0.0
+## eye 1.0.0
 Major version upgrade of eye 0.1.0!
 
-## Functions and objects (details)
-### Visual acuity handling
+### Functions and objects (details)
+#### Visual acuity handling
 * introduced new verbs `as_...` and `to_...` for class conversion for nice integration into known R grammar (#6) - simple wrapper for `va(x, to = ...)`
 * add arguments "from", "noplus" and "smallstep"
 * removed "from_logmar" and "logmarstep"
@@ -68,7 +81,7 @@ Major version upgrade of eye 0.1.0!
 * new function `va_mixed` for vectors of mixed VA notations (replacing previous `va_dissect`)
 * new function `cleanVA`
 
-### Smaller fixes
+#### Smaller fixes
 * `recodeye()` recognises "both/ou/b" for both eyes. 
 * dropunknown unclear codings are converted to NA by default (with warning)
 * removed numcode argument (other numeric codes can be passed via "to")
@@ -87,11 +100,11 @@ Major version upgrade of eye 0.1.0!
 * `clean_va` returns numeric vector if all entries are numeric
 * removed functions va_dissect() and which_va_dissect()
 
-### Data sets
+#### Data sets
 * Removed data set amd - this will be now part of the dedicated ophthalmic data set package "eyedata"
 * removed data set 'va_quali' which was anyways a part of "va_chart"
 
-# eye 0.1.0
+## eye 0.1.0
 the eye package is online!
 eye is a tool to facilitate common tasks in ophthalmic research.
 
